@@ -18,7 +18,7 @@ package lut_package is
   constant C_SEGMENT_BITS : integer := 4;
   constant C_BASE_BITS : integer := 48;
   constant C_INCLINE_BITS : integer := 32;
-  constant C_LUT_BRAM_WIDTH : integer := C_SEGMENT_BITS+C_BASE_BITS;
+  constant C_LUT_BRAM_WIDTH : integer := C_BASE_BITS+C_INCLINE_BITS;
   constant C_RAM_CONFIG_BUFFER_SIZE : integer 
     := cdiv(C_LUT_BRAM_WIDTH,C_CFG_WORD_SIZE);
   constant C_RAM_CONFIG_BUFFER_SIZE_BITS : integer := 
@@ -63,6 +63,19 @@ package lut_package is
     valid : std_logic;
   end record;
     
+  component single_port_ram
+    generic (
+      DATA_WIDTH : integer := 32;
+      ADDR_WIDTH  : integer := 8
+    );
+    port(
+      clk : in std_logic; 
+      port1_addr   : in  std_logic_vector(0 to ADDR_WIDTH-1); 
+      port1_data_w : in  std_logic_vector(0 to DATA_WIDTH-1); 
+      port1_data_r : out std_logic_vector(0 to DATA_WIDTH-1); 
+      port1_we     : in  std_logic
+    );
+  end component;
 
   component lut_controller
     port (
@@ -149,6 +162,7 @@ package lut_package is
 
     );
   end component;
+
 end package;
 
 package body lut_package is
