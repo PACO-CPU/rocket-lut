@@ -8,15 +8,26 @@ use ieee.std_logic_misc.all;
 library paco_lut;
 
 package lut_package is
+
+  function cdiv(x:positive; y:positive) return natural;
+  
   constant C_WORD_SIZE : integer := 32;
   constant C_CFG_WORD_SIZE : integer := C_WORD_SIZE;
   constant C_SELECTOR_BITS : integer := 8;
   constant C_INTERPOLATION_BITS : integer := 8;
   constant C_SEGMENT_BITS : integer := 4;
-  constant C_BASE_BITS : integer := 16;
-  constant C_INCLINE_BITS : integer := 16;
-
+  constant C_BASE_BITS : integer := 48;
+  constant C_INCLINE_BITS : integer := 32;
   constant C_LUT_BRAM_WIDTH : integer := C_SEGMENT_BITS+C_BASE_BITS;
+  constant C_RAM_CONFIG_BUFFER_SIZE : integer 
+    := cdiv(C_LUT_BRAM_WIDTH,C_CFG_WORD_SIZE);
+  constant C_RAM_CONFIG_BUFFER_SIZE_BITS : integer := 
+    C_RAM_CONFIG_BUFFER_SIZE*C_CFG_WORD_SIZE;
+  constant C_CFG_LUT_REGISTER_COUNT : integer
+    := C_RAM_CONFIG_BUFFER_SIZE*(2**C_SEGMENT_BITS);
+  constant C_CFG_CHAIN_REGISTER_COUNT : integer := 13;
+  constant C_CFG_REGISTER_COUNT : integer := 
+    C_CFG_LUT_REGISTER_COUNT+C_CFG_CHAIN_REGISTER_COUNT;
 
   type p_input_t is record
     valid : std_logic;
@@ -49,6 +60,7 @@ package lut_package is
 
   type cfg_word_t is record
     d : std_logic_vector(C_CFG_WORD_SIZE-1 downto 0);
+    valid : std_logic;
   end record;
     
 
@@ -141,6 +153,15 @@ end package;
 
 package body lut_package is
 
+  function cdiv(x:positive; y:positive) return natural is
+    variable d: natural;
+  begin
+    d:=x/y;
+    if (d*y)<x then 
+      d := d+1;
+    end if;
+    return d;
+  end function;
 
 end package body;
 
