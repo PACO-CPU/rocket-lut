@@ -1,0 +1,5 @@
+*
+!/*.xise
+!/*.gise
+!/*.vhd
+!/.gitignore
