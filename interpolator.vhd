@@ -19,10 +19,34 @@ entity interpolator is
 end entity;
 
 architecture implementation of interpolator is
+ 
+  type p_delay_t is array(0 to C_INTERPOLATOR_DELAY) of p_output_t;
+  signal p_delay : p_delay_t;
 begin
-  cfg_o <= cfg_i;
+  cfg_o <= cfg_i; -- no configuration words
+
+  process (clk) is
+    variable i: integer;
+  begin
+    if rising_edge(clk) then
+      
+      p_delay(0).valid <= pipeline_i.valid;
+
+      p_delay(0).data <= (others => '0'); -- todo: perform multiply, add 
+
+      for i in 1 to C_INTERPOLATOR_DELAY loop
+        p_delay(i) <= p_delay(i-1);
+      end loop;
+      
+      if rst='1' then
+        for i in 1 to C_INTERPOLATOR_DELAY loop
+          p_delay(i).valid <= '0';
+        end loop;
+      end if;
+
+    end if;
+  end process;
   
-  pipeline_o.valid <= '0';
-  pipeline_o.data <= (others => '0');
+  pipeline_o <= p_delay(C_INTERPOLATOR_DELAY);
 
 end architecture;
