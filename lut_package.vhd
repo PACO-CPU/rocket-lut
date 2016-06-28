@@ -25,9 +25,10 @@ package lut_package is
     C_RAM_CONFIG_BUFFER_SIZE*C_CFG_WORD_SIZE;
   constant C_CFG_LUT_REGISTER_COUNT : integer
     := C_RAM_CONFIG_BUFFER_SIZE*(2**C_SEGMENT_BITS);
-  constant C_CFG_CHAIN_REGISTER_COUNT : integer := 13;
+  constant C_CFG_CHAIN_REGISTER_COUNT : integer := 1; -- input shamt
   constant C_CFG_REGISTER_COUNT : integer := 
     C_CFG_LUT_REGISTER_COUNT+C_CFG_CHAIN_REGISTER_COUNT;
+  constant C_INTERPOLATOR_DELAY : integer := 4;
 
   type p_input_t is record
     valid : std_logic;

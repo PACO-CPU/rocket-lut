@@ -19,7 +19,7 @@ entity single_port_ram is
   );
 end entity;
 
-architecture implementation of dual_port_ram is
+architecture implementation of single_port_ram is
   type ram_t is
     array(0 to 2**ADDR_WIDTH-1)
     of std_logic_vector(0 to DATA_WIDTH-1);
