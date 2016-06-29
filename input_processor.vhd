@@ -118,6 +118,7 @@ architecture implementation of input_processor is
   signal cfg_shift_amount : cfg_word_t;
   signal input_shifted : std_logic_vector(C_EXTENDED_WIDTH-1 downto 0);
 begin
+  cfg_o.valid <= cfg_o.valid;
 
   shft: entity work.shifter generic map (
     W => C_EXTENDED_WIDTH
@@ -135,8 +136,10 @@ begin
   begin
     if rising_edge(clk) then
       -- daisy-chain our one configuration word
-      cfg_shift_amount <= cfg_i;
-      cfg_o <= cfg_shift_amount;
+      if cfg_i.valid='1' then
+        cfg_shift_amount.d <= cfg_i.d;
+        cfg_o.d <= cfg_shift_amount.d;
+      end if;
       
       
       -- extend the input word with enough zeroes to the left and right so that

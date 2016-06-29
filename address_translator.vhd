@@ -20,7 +20,8 @@ end entity;
 
 architecture implementation of address_translator is
 begin
-  cfg_o <= cfg_i;
+  cfg_o.valid <= cfg_i.valid;
+  cfg_o.data <= cfg_o.data;
   
   pipeline_o.valid <= '0';
   pipeline_o.selector <= (others => '0');
