@@ -49,7 +49,6 @@ architecture implementation of lut_controller is
 begin 
   
   error_o <= '1' when state=STATE_ERROR else '0';
-  cfg_mode_o <= '1' when state=STATE_CFG_RAM else '0';
   
   lut_data_o <= cfg_ram_buffer(
     C_RAM_CONFIG_BUFFER_SIZE_BITS - 1 downto 
@@ -67,6 +66,7 @@ begin
       pipeline_o.valid <= '0';
       cfg_ram_we  <= '0';
       cfg_o.valid <= '0';
+      cfg_mode_o  <= '0';
 
       ram_buffer_offset := 
         C_RAM_CONFIG_BUFFER_SIZE_BITS-1
@@ -79,13 +79,21 @@ begin
       
       -- delay new LUT addresses by one cycle
       lut_addr_o <= cfg_ram_addr;
-
+      
+      -- per-state signals
+      case state is 
+        when STATE_CFG_RAM => 
+          cfg_mode_o <= '1';
+        when others => 
+          null;
+      end case;
       
       -- we do not check if multiple id_*_i fields are set here because
       -- it's just some overhead we do not need right now.
       
       if id_rst_i='1' then -- perform a reset instruction
         state           <= STATE_CFG_RAM;
+        cfg_mode_o      <= '1';
         cfg_count       <= 0;
         cfg_ram_addr    <= (others => '0');
         cfg_ram_buffer_counter <= 0;
@@ -131,12 +139,12 @@ begin
 
           when STATE_CFG_CHAIN =>
             
+            cfg_o.d <= data_i;
             cfg_count <= cfg_count +1;
+            cfg_o.valid <= '1';
+            
             if cfg_count+1=C_CFG_REGISTER_COUNT then
               state <= STATE_READY;
-            else
-              cfg_o.d <= data_i;
-              cfg_o.valid <= '1';
             end if;
 
           when others =>
@@ -153,7 +161,7 @@ begin
 
           when others =>
             state <= STATE_ERROR;
-            e_invalid_cfg <= '1';
+            e_premature_exe <= '1';
 
         end case;
       
