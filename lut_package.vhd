@@ -11,24 +11,60 @@ package lut_package is
 
   function cdiv(x:positive; y:positive) return natural;
   
+  -- Embedding-specific constants (Rocket Chip/SoC)
   constant C_WORD_SIZE : integer := 32;
   constant C_CFG_WORD_SIZE : integer := C_WORD_SIZE;
+  
+  -- LUT HW core specifics
   constant C_SELECTOR_BITS : integer := 8;
   constant C_INTERPOLATION_BITS : integer := 8;
   constant C_SEGMENT_BITS : integer := 4;
+  constant C_PLA_INTERCONNECTS : integer := 12;
   constant C_BASE_BITS : integer := 48;
   constant C_INCLINE_BITS : integer := 32;
+
+  -- realization-specifics (delay steps etc)
+  constant C_ADDRESS_TRANSLATOR_DELAY : integer := 4;
+  constant C_INTERPOLATOR_DELAY : integer := 4;
+
+  -- derived constants
   constant C_LUT_BRAM_WIDTH : integer := C_BASE_BITS+C_INCLINE_BITS;
   constant C_RAM_CONFIG_BUFFER_SIZE : integer 
     := cdiv(C_LUT_BRAM_WIDTH,C_CFG_WORD_SIZE);
   constant C_RAM_CONFIG_BUFFER_SIZE_BITS : integer := 
     C_RAM_CONFIG_BUFFER_SIZE*C_CFG_WORD_SIZE;
+
+  -- number of configuration words used for the RAM in the bram_controller.
   constant C_CFG_LUT_REGISTER_COUNT : integer
     := C_RAM_CONFIG_BUFFER_SIZE*(2**C_SEGMENT_BITS);
-  constant C_CFG_CHAIN_REGISTER_COUNT : integer := 1; -- input shamt
+
+  -- number of registers used in the input processor
+  constant C_CFG_INPUT_DECODER_REGISTER_COUNT : integer := 1;
+  
+  -- number of registers used for a single row in the PLA's AND plane
+  constant C_CFG_PLA_AND_REGISTERS_PER_ROW : integer :=
+    cdiv(C_SELECTOR_BITS*2,C_CFG_WORD_SIZE);
+  -- number of registers used for the PLA's AND plane
+  constant C_CFG_PLA_AND_REGISTER_COUNT : integer :=
+    C_CFG_PLA_AND_REGISTERS_PER_ROW*C_PLA_INTERCONNECTS;
+  -- number of registers used for a single column of the PLA's OR plane
+  constant C_CFG_PLA_OR_REGISTERS_PER_COLUMN : integer :=
+    cdiv(C_PLA_INTERCONNECTS,C_CFG_WORD_SIZE);
+  -- number of registers used for the PLA's OR plane
+  constant C_CFG_PLA_OR_REGISTER_COUNT : integer :=
+    C_CFG_PLA_OR_REGISTERS_PER_COLUMN*C_SEGMENT_BITS;
+  -- number of registers used by the PLA
+  constant C_CFG_PLA_REGISTER_COUNT : integer :=
+    C_CFG_PLA_AND_REGISTER_COUNT +
+    C_CFG_PLA_OR_REGISTER_COUNT;
+
+  -- number of registers in the daisy chain part
+  constant C_CFG_CHAIN_REGISTER_COUNT : integer := 
+    C_CFG_INPUT_DECODER_REGISTER_COUNT +
+    C_CFG_PLA_REGISTER_COUNT;
+  -- total number of configuration registers
   constant C_CFG_REGISTER_COUNT : integer := 
     C_CFG_LUT_REGISTER_COUNT+C_CFG_CHAIN_REGISTER_COUNT;
-  constant C_INTERPOLATOR_DELAY : integer := 4;
 
   type p_input_t is record
     valid : std_logic;

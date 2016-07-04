@@ -118,7 +118,7 @@ architecture implementation of input_processor is
   signal cfg_shift_amount : cfg_word_t;
   signal input_shifted : std_logic_vector(C_EXTENDED_WIDTH-1 downto 0);
 begin
-  cfg_o.valid <= cfg_o.valid;
+  cfg_o.valid <= cfg_i.valid;
 
   shft: entity work.shifter generic map (
     W => C_EXTENDED_WIDTH

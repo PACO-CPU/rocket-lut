@@ -90,8 +90,8 @@ begin
   lut : bram_controller port map (
     clk => clk,
     rst => id_rst_i,
-    cfg_i => inproc_cfg_o,
-    cfg_o => pla_cfg_o,
+    cfg_i => pla_cfg_o,
+    cfg_o => lut_cfg_o,
 
     cfg_mode_i => ctrl_cfg_mode_o,
     ram_addr_i => ctrl_lut_addr_o,
@@ -105,7 +105,7 @@ begin
   inter: interpolator port map (
     clk => clk,
     rst => id_rst_i,
-    cfg_i => pla_cfg_o,
+    cfg_i => lut_cfg_o,
     cfg_o => inter_cfg_o,
 
     pipeline_i => lut_pipeline_o,
