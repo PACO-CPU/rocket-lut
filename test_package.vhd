@@ -9,6 +9,9 @@ library paco_lut;
 use paco_lut.lut_package.all;
 
 package test_package is
+  constant C_CLK_FREQ : integer := 200000000;
+  constant C_BAUD_RATE : integer := 921600;
+
   constant CMD_ECHO : std_logic_vector(7 downto 0) := x"01";
   constant CMD_CFG_WORD : std_logic_vector(7 downto 0) := x"10";
   constant CMD_COMPUTE_PLA : std_logic_vector(7 downto 0) := x"21";
@@ -19,6 +22,8 @@ package test_package is
   constant CMD_CFG_PLA_INTERCONNECTS : std_logic_vector(7 downto 0) := x"05";
   constant CMD_CFG_BASE_BITS : std_logic_vector(7 downto 0) := x"06";
   constant CMD_CFG_INCLINE_BITS : std_logic_vector(7 downto 0) := x"07";
+  constant CMD_CFG_ADDRESS_TRANSLATOR_DELAY : std_logic_vector(7 downto 0) := x"08";
+  constant CMD_CFG_INTERPOLATOR_DELAY : std_logic_vector(7 downto 0) := x"09";
   
   type pla_i_signals_t is record
     id_rst_i : std_logic;

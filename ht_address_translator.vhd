@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
 
 library paco_lut;
 use paco_lut.lut_package.all;
@@ -17,10 +18,6 @@ entity ht_address_translator is
 end entity;
 
 architecture implementation of ht_address_translator is
-  constant C_CLK_FREQ : integer := 200000000;
-  constant C_BAUD_RATE : integer := 115200;
-
-  
   signal word : std_logic_vector(31 downto 0);
   signal word_counter : integer;
 
@@ -118,6 +115,31 @@ begin
                 state_post_rx <= WRITE_PIPELINE;
                 state_post_tx <= IDLE;
                 state <= RX_WORD;
+
+              when CMD_CFG_SELECTOR_BITS =>
+                tx_valid <= '1';
+                tx_data <= conv_std_logic_vector(C_SELECTOR_BITS,8);
+              when CMD_CFG_INTERPOLATION_BITS =>
+                tx_valid <= '1';
+                tx_data <= conv_std_logic_vector(C_INTERPOLATION_BITS,8);
+              when CMD_CFG_SEGMENT_BITS =>
+                tx_valid <= '1';
+                tx_data <= conv_std_logic_vector(C_SEGMENT_BITS,8);
+              when CMD_CFG_PLA_INTERCONNECTS =>
+                tx_valid <= '1';
+                tx_data <= conv_std_logic_vector(C_PLA_INTERCONNECTS,8);
+              when CMD_CFG_BASE_BITS =>
+                tx_valid <= '1';
+                tx_data <= conv_std_logic_vector(C_BASE_BITS,8);
+              when CMD_CFG_INCLINE_BITS =>
+                tx_valid <= '1';
+                tx_data <= conv_std_logic_vector(C_INCLINE_BITS,8);
+              when CMD_CFG_ADDRESS_TRANSLATOR_DELAY =>
+                tx_valid <= '1';
+                tx_data <= conv_std_logic_vector(C_ADDRESS_TRANSLATOR_DELAY,8);
+              when CMD_CFG_INTERPOLATOR_DELAY =>
+                tx_valid <= '1';
+                tx_data <= conv_std_logic_vector(C_INTERPOLATOR_DELAY,8);
               when others =>
                 tx_valid <= '1';
                 tx_data <= rx_data;
