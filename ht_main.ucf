@@ -1,0 +1,16 @@
+
+NET "CLK"                      LOC = "J9";     ## 4   on U11, 4 on U89 (DNP)
+NET "RST"                      LOC = "G26";    ## 2   on SW10 pushbutton (active-High)
+NET "RST" CLOCK_DEDICATED_ROUTE = "FALSE";
+
+NET "RXD"                      LOC = "J24";    ## 24  on U34
+NET "TXD"                      LOC = "J25";    ## 25  on U34
+
+NET "LED(0)"                    LOC = "AC22";   ## 2   on LED DS12, 1 on J62
+NET "LED(1)"                    LOC = "AC24";   ## 2   on LED DS11, 2 on J62
+NET "LED(2)"                    LOC = "AE22";   ## 2   on LED DS9,  3 on J62
+NET "LED(3)"                    LOC = "AE23";   ## 2   on LED DS10, 4 on J62
+NET "LED(4)"                    LOC = "AB23";   ## 2   on LED DS15, 5 on J62
+NET "LED(5)"                    LOC = "AG23";   ## 2   on LED DS14, 6 on J62
+NET "LED(6)"                    LOC = "AE24";   ## 2   on LED DS22, 7 on J62
+NET "LED(7)"                    LOC = "AD24";   ## 2   on LED DS21, 8 on J62
