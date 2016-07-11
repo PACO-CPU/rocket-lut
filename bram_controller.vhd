@@ -65,20 +65,20 @@ begin
       pipeline_1.selector <= pipeline_i.selector;
       pipeline_1.interpolator <= pipeline_i.interpolator;
       
-      -- output stage
-      pipeline_o.valid <= pipeline_1.valid;
-      pipeline_o.selector <= pipeline_1.selector;
-      pipeline_o.interpolator <= pipeline_1.interpolator;
-      pipeline_o.base <= mem_data_r(C_LUT_BRAM_WIDTH-1 downto C_INCLINE_BITS);
-      pipeline_o.incline <= mem_data_r(C_INCLINE_BITS-1 downto 0);
 
       if rst='1' then
         pipeline_1.valid <= '0';
-        pipeline_o.valid <= '0';
+       -- pipeline_o.valid <= '0';
       end if;
 
     end if;
   end process;
 
+  -- output stage
+  pipeline_o.valid <= pipeline_1.valid;
+  pipeline_o.selector <= pipeline_1.selector;
+  pipeline_o.interpolator <= pipeline_1.interpolator;
+  pipeline_o.base <= mem_data_r(C_LUT_BRAM_WIDTH-1 downto C_INCLINE_BITS);
+  pipeline_o.incline <= mem_data_r(C_INCLINE_BITS-1 downto 0);
 end architecture;
 
