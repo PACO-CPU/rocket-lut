@@ -24,96 +24,71 @@ architecture implementation of address_translator is
     array(0 to C_PLA_INTERCONNECTS-1) of 
     std_logic_vector(
       C_CFG_WORD_SIZE*C_CFG_PLA_AND_REGISTERS_PER_ROW-1 downto 0);
-    --2*C_SELECTOR_BITS-1);
   signal and_crosspoints : and_crosspoints_t;
 
   type or_crosspoints_t is
     array(0 to C_SEGMENT_BITS-1) of
     std_logic_vector(
       C_CFG_WORD_SIZE*C_CFG_PLA_OR_REGISTERS_PER_COLUMN-1 downto 0);
-    --C_PLA_INTERCONNECTS-1);
   signal or_crosspoints : or_crosspoints_t;
 
   signal interconnects: std_logic_vector(C_PLA_INTERCONNECTS-1 downto 0);
 
   signal outputs : std_logic_vector(C_SEGMENT_BITS-1 downto 0);
 
-  type p_delay_t is array(0 to C_INTERPOLATOR_DELAY) of p_lut_t;
+  type p_delay_t is array(0 to C_ADDRESS_TRANSLATOR_DELAY) of p_lut_t;
   signal p_delay : p_delay_t;
+  signal p_result : p_lut_t;
 
-  function reduce_and(s : std_logic_vector) return std_logic is
-    variable v : std_logic;
-    variable i: integer;
-  begin
-    v := '1';
-    for i in s'range loop
-      v := v and s(i);
-    end loop;
-    return v;
-  end function;
-
-  function reduce_or(s : std_logic_vector) return std_logic is
-    variable v : std_logic;
-    variable i: integer;
-  begin
-    v := '1';
-    for i in s'range loop
-      v := v or s(i);
-    end loop;
-    return v;
-  end function;
-  
-  function compute_interconnects(
-    input : std_logic_vector; 
-    crosspoints : and_crosspoints_t) 
-    return std_logic_vector is
-    variable res : std_logic_vector(0 to C_PLA_INTERCONNECTS-1);
-    variable i: integer;
-  begin
-    for i in 0 to C_PLA_INTERCONNECTS-1 loop
-      res(i) := reduce_and(
-        (input & not input) and crosspoints(i)(2*C_SELECTOR_BITS-1 downto 0));
-    end loop;
-    return res;
-  end function;
-
-  function compute_outputs(
-    interconnects : std_logic_vector;
-    crosspoints : or_crosspoints_t)
-    return std_logic_vector is
-    variable res : std_logic_vector(0 to C_SEGMENT_BITS-1);
-    variable i: integer;
-  begin
-    for i in 0 to C_SEGMENT_BITS-1 loop
-      res(i) := reduce_or(
-        interconnects & crosspoints(i)(C_PLA_INTERCONNECTS-1 downto 0));
-    end loop;
-    return res;
-  end function;
 begin
   cfg_o.valid <= cfg_i.valid;
-  
+
   -- PLA combinational logic
-  interconnects <= compute_interconnects(
-    pipeline_i.selector,
-    and_crosspoints);
+  process(clk) is 
+    variable t_and_line : std_logic_vector(2*C_SELECTOR_BITS-1 downto 0);
+    variable t_or_line : std_logic_vector(C_PLA_INTERCONNECTS-1 downto 0);
+    variable t_interconnects : std_logic_vector(C_PLA_INTERCONNECTS-1 downto 0);
+    constant AND_ONE : std_logic_vector(2*C_SELECTOR_BITS-1 downto 0) :=
+      (others => '1');
+    constant OR_ZERO : std_logic_vector(C_PLA_INTERCONNECTS-1 downto 0) :=
+      (others => '0');
+    variable i : integer;
+  begin 
+    p_result.valid <= pipeline_i.valid;
+    p_result.selector <= pipeline_i.selector;
+    p_result.interpolator <= pipeline_i.interpolator;
+    for i in 0 to C_PLA_INTERCONNECTS-1 loop
+      t_and_line := 
+        (
+          (pipeline_i.selector & not pipeline_i.selector) and 
+          and_crosspoints(i)(2*C_SELECTOR_BITS-1 downto 0)) or
+        (not and_crosspoints(i)(2*C_SELECTOR_BITS-1 downto 0));
+      if t_and_line=AND_ONE then
+        t_interconnects(i) := '1';
+      else 
+        t_interconnects(i) := '0';
+      end if;
+    end loop;
+    
+    for i in 0 to C_SEGMENT_BITS-1 loop
+      t_or_line := 
+        t_interconnects and or_crosspoints(i)(C_PLA_INTERCONNECTS-1 downto 0);
+      if t_or_line=OR_ZERO then
+        p_result.address(i) <= '0';
+      else
+        p_result.address(i) <= '1';
+      end if;
+    end loop;
+    
+  end process;
 
-  outputs <= compute_outputs(
-    interconnects,
-    or_crosspoints);
-
-  -- PLA result insertion into delay pipeline
-  p_delay(0).valid <= pipeline_i.valid;
-  p_delay(0).selector <= pipeline_i.selector;
-  p_delay(0).interpolator <= pipeline_i.interpolator;
-  p_delay(0).address <= outputs;
-  
   -- configuration logic
   process (clk) is 
+    variable i: integer;
+    variable j: integer;
   begin
     
     if rising_edge(clk) and cfg_i.valid='1' then
-      
       -- AND plane registers
       for i in 0 to C_PLA_INTERCONNECTS-1 loop
         if i=0 then
@@ -162,12 +137,14 @@ begin
         end loop;
       end loop;
 
-
     end if;
   end process;
   cfg_o.d <= or_crosspoints(C_SEGMENT_BITS-1)(C_CFG_WORD_SIZE-1 downto 0);
   
-  -- delay pipeline sequential logic
+  -- delay pipeline: result -> delay(0) -> ... -> pipeline_o
+  -- since p_result and pipeline_o are combinational, even a setting of 
+  -- C_ADDRESS_TRANSLATOR_DELAY=0 should work.
+  p_delay(0) <= p_result;
   process (clk) is
     variable i: integer;
   begin
@@ -178,16 +155,13 @@ begin
       end loop;
       
       if rst='1' then
-        for i in 1 to C_INTERPOLATOR_DELAY loop
+        for i in 1 to C_ADDRESS_TRANSLATOR_DELAY loop
           p_delay(i).valid <= '0';
         end loop;
       end if;
 
     end if;
   end process;
-  
-  -- delay pipeline -> output
   pipeline_o <= p_delay(C_ADDRESS_TRANSLATOR_DELAY);
-
-
+  
 end architecture;
