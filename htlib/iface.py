@@ -7,15 +7,17 @@ from .error import TestFailure
 CMD_ECHO = 0x01
 CMD_CFG_WORD = 0x10
 CMD_COMPUTE_PLA = 0x21
+CMD_COMPUTE_IDEC = 0x22
+CMD_CFG_INPUT_WORDS = 0x0b
 CMD_CFG_SELECTOR_BITS = 0x02
 CMD_CFG_INTERPOLATION_BITS = 0x03
 CMD_CFG_SEGMENT_BITS = 0x04
 CMD_CFG_PLA_INTERCONNECTS = 0x05
 CMD_CFG_BASE_BITS = 0x06
 CMD_CFG_INCLINE_BITS = 0x07
+CMD_CFG_INPUT_DECODER_DELAY = 0x0a
 CMD_CFG_ADDRESS_TRANSLATOR_DELAY = 0x08
 CMD_CFG_INTERPOLATOR_DELAY = 0x09
-
 class IFace(serial.Serial):
   
   def __init__(s,port,baud):
@@ -27,6 +29,7 @@ class IFace(serial.Serial):
     s._pla_interconnects=12
     s._base_bits=48
     s._incline_bits=32
+    s._input_words=1
   
     s._address_translator_delay=1
     s._interpolator_delay=4
@@ -43,7 +46,17 @@ class IFace(serial.Serial):
     raw=s.read(4)
     return struct.unpack("<I",raw)[0]
 
+  def commandi(s,cmd,data):
+    words=[
+      (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
+      for shamt in range(s.INPUT_WORDS)]
+    raw=struct.pack("<B%s"%("I"*s.INPUT_WORDS),cmd,*words)
+    s.write(raw)
+    raw=s.read(4)
+    return struct.unpack("<I",raw)[0]
+
   def load_config(s):
+    s._input_words=s.command8(CMD_CFG_INPUT_WORDS)
     s._selector_bits=s.command8(CMD_CFG_SELECTOR_BITS)
     s._interpolation_bits=s.command8(CMD_CFG_INTERPOLATION_BITS)
     s._segment_bits=s.command8(CMD_CFG_SEGMENT_BITS)
@@ -51,6 +64,7 @@ class IFace(serial.Serial):
     s._base_bits=s.command8(CMD_CFG_BASE_BITS)
     s._incline_bits=s.command8(CMD_CFG_INCLINE_BITS)
 
+    s._input_decoder_delay=s.command8(CMD_CFG_INPUT_DECODER_DELAY)
     s._address_translator_delay=s.command8(CMD_CFG_ADDRESS_TRANSLATOR_DELAY)
     s._interpolator_delay=s.command8(CMD_CFG_INTERPOLATOR_DELAY)
 
@@ -83,6 +97,10 @@ class IFace(serial.Serial):
     return s.WORD_SIZE
 
   @property
+  def INPUT_WORDS(s):
+    return s._input_words
+
+  @property
   def SELECTOR_BITS(s):
     return s._selector_bits
 
@@ -113,6 +131,10 @@ class IFace(serial.Serial):
   @property
   def INTERPOLATOR_DELAY(s):
     return s._interpolator_delay
+  
+  @property
+  def INPUT_WORD_SIZE(s):
+    return s.WORD_SIZE*s.INPUT_WORDS
 
   @property
   def LUT_BRAM_WIDTH(s):
@@ -127,12 +149,19 @@ class IFace(serial.Serial):
     return s.RAM_CONFIG_BUFFER_SIZE*s.CFG_WORD_SIZE
 
   @property
-  def CFG_LUT_iREGISTER_COUNT(s):
+  def CFG_LUT_REGISTER_COUNT(s):
     return s.RAM_CONFIG_BUFFER_SIZE*(1<<s.SEGMENT_BITS)
 
   @property
+  def CFG_INPUT_DECODER_REGISTERS_PER_BIT(s):
+    return math.ceil(s.INPUT_WORD_SIZE/s.CFG_WORD_SIZE)
+
+  @property
   def CFG_INPUT_DECODER_REGISTER_COUNT(s):
-    return 1
+    return (
+      s.CFG_INPUT_DECODER_REGISTERS_PER_BIT*
+      (s.SELECTOR_BITS+s.INTERPOLATION_BITS)
+      )
 
   @property
   def CFG_PLA_AND_REGISTERS_PER_ROW(s):
