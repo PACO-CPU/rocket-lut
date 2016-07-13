@@ -13,7 +13,7 @@ entity lut_controller is
     id_stat_i : in std_logic;
     id_exe_i : in std_logic;
     id_cfg_i : in std_logic;
-    data_i : in std_logic_vector(C_WORD_SIZE-1 downto 0);
+    data_i : in std_logic_vector(C_INPUT_WORDS*C_WORD_SIZE-1 downto 0);
 
     status_o : out std_logic_vector(C_WORD_SIZE-1 downto 0);
     error_o : out std_logic;

@@ -10,6 +10,7 @@ library paco_lut;
 package lut_package is
 
   function cdiv(x:positive; y:positive) return natural;
+  function max(x:integer; y:integer) return integer;
   
   -- Embedding-specific constants (Rocket Chip/SoC)
   constant C_WORD_SIZE : integer := 32;
@@ -130,7 +131,7 @@ package lut_package is
       id_stat_i : in std_logic;
       id_exe_i : in std_logic;
       id_cfg_i : in std_logic;
-      data_i : in std_logic_vector(C_WORD_SIZE-1 downto 0);
+      data_i : in std_logic_vector(C_INPUT_WORDS*C_WORD_SIZE-1 downto 0);
 
       status_o : out std_logic_vector(C_WORD_SIZE-1 downto 0);
       error_o : out std_logic;
@@ -221,6 +222,15 @@ package body lut_package is
       d := d+1;
     end if;
     return d;
+  end function;
+
+  function max(x:integer; y:integer) return integer is
+  begin
+    if x>y then 
+      return x; 
+    else 
+      return x; 
+    end if;
   end function;
 
 end package body;
