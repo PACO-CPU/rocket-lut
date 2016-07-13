@@ -84,6 +84,7 @@ print("  segment bits: ........... %s"%iface.SEGMENT_BITS)
 print("  pla interconnects: ...... %s"%iface.PLA_INTERCONNECTS)
 print("  base bits: .............. %s"%iface.BASE_BITS)
 print("  incline bits: ........... %s"%iface.INCLINE_BITS)
+print("  input decoder delay: .... %s"%iface.INPUT_DECODER_DELAY)
 print("  address translator delay: %s"%iface.ADDRESS_TRANSLATOR_DELAY)
 print("  interpolator delay: ..... %s"%iface.INTERPOLATOR_DELAY)
 
@@ -91,12 +92,17 @@ print("  interpolator delay: ..... %s"%iface.INTERPOLATOR_DELAY)
 print("\x1b[34;1mRunning\x1b[30;0m: config test")
 iface.test_config(iface.CFG_INPUT_DECODER_REGISTER_COUNT)
 
+def fmt_bv(x,cb):
+  bv=("{0:%ib}"%cb).format(x)
+  bv=" ".join([bv[i:i+8] for i in range(0,len(bv),8)])
+  return bv
+
 # automatically generate and test decoder configurations
 print(
   "\x1b[34;1mRunning\x1b[30;0m: automatic test (%i configs, %i points)"
   %(randomConfigCount,randomInputCount))
 random.seed(time.time())
-with htlib.ProgressBar(0,randomConfigCount) as pb_pla:
+with htlib.ProgressBar(0,randomConfigCount) as pb_idec:
   for i_cfg in range(randomConfigCount):
     choices=[
       random.randint(0,iface.INPUT_WORDS*iface.WORD_SIZE-1) 
@@ -104,16 +110,19 @@ with htlib.ProgressBar(0,randomConfigCount) as pb_pla:
     (words,sim)=choices_compile(*choices)
     config_hw(*choices)
     
-    with htlib.ProgressBar(0,randomInputCount,parent=pb_pla) as pb_input:
+    with htlib.ProgressBar(0,randomInputCount,parent=pb_idec) as pb_input:
       for i_input in range(randomInputCount):
         x=random.randint(0,(1<<(iface.WORD_SIZE*iface.INPUT_WORDS))-1)
         y_sim=sim(x)
-        y_pla=iface.commandi(htlib.CMD_COMPUTE_IDEC,x)
-        if y_sim!=y_pla:
+        y_idec=iface.commandi(htlib.CMD_COMPUTE_IDEC,x)
+        if y_sim!=y_idec:
           sys.stderr.write(
             "\r\x1b[31;1mERROR\x1b[30;0m: "
-            "mismatch (code: <%s>, x: %.8x, y_sim: %.8x, y_pla: %.8x)\n"
-            %(" ".join([str(v) for v in choices]),x,y_sim,y_pla))
+            "mismatch (code: <%s>)\n  x:      %s\n  y_sim:  %s\n  y_idec: %s\n"
+            %(" ".join([str(v) for v in choices]),
+            fmt_bv(x,iface.INPUT_WORDS*iface.WORD_SIZE),
+            fmt_bv(y_sim,iface.SELECTOR_BITS+iface.INTERPOLATION_BITS),
+            fmt_bv(y_idec,iface.SELECTOR_BITS+iface.INTERPOLATION_BITS)))
         pb_input.increment(1)
 
 

@@ -49,7 +49,7 @@ class IFace(serial.Serial):
   def commandi(s,cmd,data):
     words=[
       (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
-      for shamt in range(s.INPUT_WORDS)]
+      for shamt in reversed(range(s.INPUT_WORDS))]
     raw=struct.pack("<B%s"%("I"*s.INPUT_WORDS),cmd,*words)
     s.write(raw)
     raw=s.read(4)
@@ -123,6 +123,10 @@ class IFace(serial.Serial):
   @property
   def INCLINE_BITS(s):
     return s._incline_bits
+
+  @property
+  def INPUT_DECODER_DELAY(s):
+    return s._input_decoder_delay
 
   @property
   def ADDRESS_TRANSLATOR_DELAY(s):
