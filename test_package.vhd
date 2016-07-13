@@ -15,8 +15,10 @@ package test_package is
   constant CMD_ECHO : std_logic_vector(7 downto 0) := x"01";
   constant CMD_CFG_WORD : std_logic_vector(7 downto 0) := x"10";
   constant CMD_COMPUTE_PLA : std_logic_vector(7 downto 0) := x"21";
+  constant CMD_COMPUTE_IDEC : std_logic_vector(7 downto 0) := x"22";
   constant CMD_COMPUTE_INTER : std_logic_vector(7 downto 0) := x"23";
 
+  constant CMD_CFG_INPUT_WORDS : std_logic_vector(7 downto 0) := x"0b";
   constant CMD_CFG_SELECTOR_BITS : std_logic_vector(7 downto 0) := x"02";
   constant CMD_CFG_INTERPOLATION_BITS : std_logic_vector(7 downto 0) := x"03";
   constant CMD_CFG_SEGMENT_BITS : std_logic_vector(7 downto 0) := x"04";
@@ -25,7 +27,18 @@ package test_package is
   constant CMD_CFG_INCLINE_BITS : std_logic_vector(7 downto 0) := x"07";
   constant CMD_CFG_ADDRESS_TRANSLATOR_DELAY : std_logic_vector(7 downto 0) := x"08";
   constant CMD_CFG_INTERPOLATOR_DELAY : std_logic_vector(7 downto 0) := x"09";
+  constant CMD_CFG_INPUT_DECODER_DELAY : std_logic_vector(7 downto 0) := x"0a";
   
+  type idec_i_signals_t is record
+    id_rst_i : std_logic;
+    cfg_i : cfg_word_t;
+    pipeline_i : p_input_t;
+  end record;
+
+  type idec_o_signals_t is record
+    cfg_o : cfg_word_t;
+    pipeline_o : p_pla_t;
+  end record;
   type pla_i_signals_t is record
     id_rst_i : std_logic;
     cfg_i : cfg_word_t;

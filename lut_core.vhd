@@ -14,9 +14,11 @@ entity lut_core is
     id_stat_i : in std_logic;
     id_exe_i : in std_logic;
     id_cfg_i : in std_logic;
-    data_i : in std_logic_vector(C_WORD_SIZE-1 downto 0);
+    data_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- rs
+    data2_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- rt
+    data3_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- ru
 
-    data_o : out std_logic_vector(C_WORD_SIZE-1 downto 0);
+    data_o : out std_logic_vector(C_WORD_SIZE-1 downto 0); -- rd
     data_valid_o : out std_logic;
     
     status_o : out std_logic_vector(C_WORD_SIZE-1 downto 0);
@@ -26,6 +28,7 @@ entity lut_core is
 end entity;
 
 architecture implementation of lut_core is
+  signal input_data : std_logic_vector(max(3,C_INPUT_WORDS)*C_WORD_SIZE-1 downto 0);
   signal ctrl_cfg_mode_o : std_logic;
   signal ctrl_cfg_o : cfg_word_t;
   signal ctrl_pipeline_o : p_input_t;
@@ -48,13 +51,15 @@ architecture implementation of lut_core is
 
 begin
   
+  input_data <= (others => '0') & data3_i & data2_i & data_i;
+  
   ctrl: lut_controller port map (
     clk => clk,
     id_rst_i => id_rst_i,
     id_stat_i => id_stat_i,
     id_exe_i => id_exe_i,
     id_cfg_i => id_cfg_i,
-    data_i => data_i,
+    data_i => input_data(C_INPUT_WORDS*C_WORD_SIZE-1 downto 0),
 
     status_o => status_o,
     error_o => error_o,

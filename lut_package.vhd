@@ -15,6 +15,7 @@ package lut_package is
   -- Embedding-specific constants (Rocket Chip/SoC)
   constant C_WORD_SIZE : integer := 32;
   constant C_CFG_WORD_SIZE : integer := C_WORD_SIZE;
+  constant C_INPUT_WORDS : integer := 3;
   
   -- LUT HW core specifics
   constant C_SELECTOR_BITS : integer := 8;
@@ -25,10 +26,12 @@ package lut_package is
   constant C_INCLINE_BITS : integer := 32;
 
   -- realization-specifics (delay steps etc)
+  constant C_INPUT_DECODER_DELAY : integer := 1;
   constant C_ADDRESS_TRANSLATOR_DELAY : integer := 1;
   constant C_INTERPOLATOR_DELAY : integer := 0;
 
   -- derived constants
+  constant C_INPUT_WORD_SIZE : integer := C_WORD_SIZE*C_INPUT_WORDS;
   constant C_LUT_BRAM_WIDTH : integer := C_BASE_BITS+C_INCLINE_BITS;
   constant C_RAM_CONFIG_BUFFER_SIZE : integer 
     := cdiv(C_LUT_BRAM_WIDTH,C_CFG_WORD_SIZE);
@@ -38,9 +41,15 @@ package lut_package is
   -- number of configuration words used for the RAM in the bram_controller.
   constant C_CFG_LUT_REGISTER_COUNT : integer
     := C_RAM_CONFIG_BUFFER_SIZE*(2**C_SEGMENT_BITS);
+  
+  -- number of configuration words used for a single bit in the input processor
+  constant C_CFG_INPUT_DECODER_REGISTERS_PER_BIT : integer :=
+    cdiv(C_INPUT_WORD_SIZE,C_CFG_WORD_SIZE);
 
   -- number of registers used in the input processor
-  constant C_CFG_INPUT_DECODER_REGISTER_COUNT : integer := 1;
+  constant C_CFG_INPUT_DECODER_REGISTER_COUNT : integer := 
+    C_CFG_INPUT_DECODER_REGISTERS_PER_BIT
+    *(C_SELECTOR_BITS+C_INTERPOLATION_BITS);
   
   -- number of registers used for a single row in the PLA's AND plane
   constant C_CFG_PLA_AND_REGISTERS_PER_ROW : integer :=
@@ -69,7 +78,7 @@ package lut_package is
 
   type p_input_t is record
     valid : std_logic;
-    data : std_logic_vector(C_WORD_SIZE-1 downto 0);
+    data : std_logic_vector(C_INPUT_WORD_SIZE-1 downto 0);
   end record;
   type p_pla_t is record
     valid : std_logic;
@@ -122,7 +131,7 @@ package lut_package is
       id_stat_i : in std_logic;
       id_exe_i : in std_logic;
       id_cfg_i : in std_logic;
-      data_i : in std_logic_vector(C_WORD_SIZE-1 downto 0);
+      data_i : in std_logic_vector(C_INPUT_WORDS*C_WORD_SIZE-1 downto 0);
 
       status_o : out std_logic_vector(C_WORD_SIZE-1 downto 0);
       error_o : out std_logic;
