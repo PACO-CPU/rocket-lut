@@ -18,6 +18,11 @@ package test_package is
   constant CMD_COMPUTE_IDEC : std_logic_vector(7 downto 0) := x"22";
   constant CMD_COMPUTE_INTER : std_logic_vector(7 downto 0) := x"23";
 
+  constant CMD_CORE_RST : std_logic_vector(7 downto 0) := x"30";
+  constant CMD_CORE_STAT : std_logic_vector(7 downto 0) := x"31";
+  constant CMD_CORE_EXE : std_logic_vector(7 downto 0) := x"32";
+  constant CMD_CORE_CFG : std_logic_vector(7 downto 0) := x"33";
+
   constant CMD_CFG_INPUT_WORDS : std_logic_vector(7 downto 0) := x"0b";
   constant CMD_CFG_SELECTOR_BITS : std_logic_vector(7 downto 0) := x"02";
   constant CMD_CFG_INTERPOLATION_BITS : std_logic_vector(7 downto 0) := x"03";
@@ -60,6 +65,25 @@ package test_package is
     cfg_o : cfg_word_t;
     pipeline_o : p_output_t;
   end record;
+
+  type core_i_signals_t is record
+    id_rst_i : std_logic;
+    id_stat_i : std_logic;
+    id_exe_i : std_logic;
+    id_cfg_i : std_logic;
+    data_i : std_logic_vector(C_WORD_SIZE-1 downto 0);
+    data2_i : std_logic_vector(C_WORD_SIZE-1 downto 0);
+    data3_i : std_logic_vector(C_WORD_SIZE-1 downto 0);
+  end record;
+
+  type core_o_signals_t is record
+    data_o : std_logic_vector(C_WORD_SIZE-1 downto 0);
+    data_valid_o : std_logic;
+    status_o : std_logic_vector(C_WORD_SIZE-1 downto 0);
+    error_o : std_logic;
+  end record;
+
+
 
   component uart_receiver
     generic(

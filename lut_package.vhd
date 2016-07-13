@@ -26,8 +26,8 @@ package lut_package is
   constant C_INCLINE_BITS : integer := 32;
 
   -- realization-specifics (delay steps etc)
-  constant C_INPUT_DECODER_DELAY : integer := 1;
-  constant C_ADDRESS_TRANSLATOR_DELAY : integer := 1;
+  constant C_INPUT_DECODER_DELAY : integer := 0;
+  constant C_ADDRESS_TRANSLATOR_DELAY : integer := 0;
   constant C_INTERPOLATOR_DELAY : integer := 0;
 
   -- derived constants
@@ -210,6 +210,25 @@ package lut_package is
     );
   end component;
 
+  component lut_core
+    port (
+      clk : in std_logic;
+      id_rst_i : in std_logic;
+      id_stat_i : in std_logic;
+      id_exe_i : in std_logic;
+      id_cfg_i : in std_logic;
+      data_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- rs
+      data2_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- rt
+      data3_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- ru
+
+      data_o : out std_logic_vector(C_WORD_SIZE-1 downto 0); -- rd
+      data_valid_o : out std_logic;
+      
+      status_o : out std_logic_vector(C_WORD_SIZE-1 downto 0);
+      error_o : out std_logic
+
+    );
+  end component;
 end package;
 
 package body lut_package is

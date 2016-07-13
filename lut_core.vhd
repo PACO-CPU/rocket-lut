@@ -28,7 +28,8 @@ entity lut_core is
 end entity;
 
 architecture implementation of lut_core is
-  signal input_data : std_logic_vector(max(3,C_INPUT_WORDS)*C_WORD_SIZE-1 downto 0);
+  constant C_INPUT_BUFFER_SIZE : integer := max(3,C_INPUT_WORDS)*C_WORD_SIZE;
+  signal input_data : std_logic_vector(C_INPUT_BUFFER_SIZE-1 downto 0);
   signal ctrl_cfg_mode_o : std_logic;
   signal ctrl_cfg_o : cfg_word_t;
   signal ctrl_pipeline_o : p_input_t;
@@ -50,8 +51,8 @@ architecture implementation of lut_core is
   signal inter_pipeline_o : p_output_t;
 
 begin
-  
-  input_data <= (others => '0') & data3_i & data2_i & data_i;
+  input_data(C_INPUT_BUFFER_SIZE-1 downto 3*C_WORD_SIZE) <= (others => '0');
+  input_data(3*C_WORD_SIZE-1 downto 0) <= data3_i & data2_i & data_i;
   
   ctrl: lut_controller port map (
     clk => clk,

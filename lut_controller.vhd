@@ -139,7 +139,7 @@ begin
 
           when STATE_CFG_CHAIN =>
             
-            cfg_o.d <= data_i;
+            cfg_o.d <= data_i(C_CFG_WORD_SIZE-1 downto 0);
             cfg_count <= cfg_count +1;
             cfg_o.valid <= '1';
             
