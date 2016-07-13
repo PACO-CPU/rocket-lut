@@ -45,8 +45,7 @@ begin
   
   -- sign-aware extraction of the result's LSB
   p_result.valid <= pipeline_i.valid;
-  p_result.data <= 
-    result_bv_ext(C_RESULT_BITS_EXT-1) & result_bv_ext(C_WORD_SIZE-2 downto 0);
+  p_result.data <= result_bv_ext(C_WORD_SIZE-1 downto 0);
   
   p_delay(0) <= p_result;
   process (clk) is

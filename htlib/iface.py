@@ -7,6 +7,7 @@ from .error import TestFailure
 CMD_ECHO = 0x01
 CMD_CFG_WORD = 0x10
 CMD_COMPUTE_PLA = 0x21
+CMD_COMPUTE_INTER = 0x23
 CMD_CFG_SELECTOR_BITS = 0x02
 CMD_CFG_INTERPOLATION_BITS = 0x03
 CMD_CFG_SEGMENT_BITS = 0x04
@@ -42,6 +43,32 @@ class IFace(serial.Serial):
     s.write(raw)
     raw=s.read(4)
     return struct.unpack("<I",raw)[0]
+
+  def command_inter(s,cmd,selector,interpolator,base,incline):
+    word=0
+    word=(word<<s.SELECTOR_BITS) | selector
+    word=(word<<s.INTERPOLATION_BITS) | interpolator 
+    word=(word<<s.BASE_BITS) | base
+    word=(word<<s.INCLINE_BITS) | incline
+    
+    byte_count=math.ceil(
+      (s.SELECTOR_BITS+s.INTERPOLATION_BITS+s.BASE_BITS+s.INCLINE_BITS)/32)*4
+
+    raw=bytes([cmd]+[(word>>(8*shamt))&0xff for shamt in range(byte_count)])
+    
+    if False:
+      word_count=math.ceil(
+        (s.SELECTOR_BITS+s.INTERPOLATION_BITS+s.BASE_BITS+s.INCLINE_BITS)/32)
+
+      words=[
+        (word>>(32*shamt))&0xffffffff 
+        for shamt in reversed(range(word_count))]
+
+      raw=struct.pack("<B%s"%("I"*word_count),cmd,*words)
+      
+    s.write(raw)
+    raw=s.read(4)
+    return struct.unpack("<I",raw[:4])[0]
 
   def load_config(s):
     s._selector_bits=s.command8(CMD_CFG_SELECTOR_BITS)

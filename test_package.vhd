@@ -15,6 +15,7 @@ package test_package is
   constant CMD_ECHO : std_logic_vector(7 downto 0) := x"01";
   constant CMD_CFG_WORD : std_logic_vector(7 downto 0) := x"10";
   constant CMD_COMPUTE_PLA : std_logic_vector(7 downto 0) := x"21";
+  constant CMD_COMPUTE_INTER : std_logic_vector(7 downto 0) := x"23";
 
   constant CMD_CFG_SELECTOR_BITS : std_logic_vector(7 downto 0) := x"02";
   constant CMD_CFG_INTERPOLATION_BITS : std_logic_vector(7 downto 0) := x"03";
@@ -34,6 +35,17 @@ package test_package is
   type pla_o_signals_t is record
     cfg_o : cfg_word_t;
     pipeline_o : p_lut_t;
+  end record;
+
+  type inter_i_signals_t is record
+    id_rst_i : std_logic;
+    cfg_i : cfg_word_t;
+    pipeline_i : p_interpolator_t;
+  end record;
+
+  type inter_o_signals_t is record
+    cfg_o : cfg_word_t;
+    pipeline_o : p_output_t;
   end record;
 
   component uart_receiver
