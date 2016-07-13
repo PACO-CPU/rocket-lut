@@ -10,6 +10,7 @@ library paco_lut;
 package lut_package is
 
   function cdiv(x:positive; y:positive) return natural;
+  function max(x:integer; y:integer) return integer;
   
   -- Embedding-specific constants (Rocket Chip/SoC)
   constant C_WORD_SIZE : integer := 32;
@@ -25,7 +26,7 @@ package lut_package is
 
   -- realization-specifics (delay steps etc)
   constant C_ADDRESS_TRANSLATOR_DELAY : integer := 1;
-  constant C_INTERPOLATOR_DELAY : integer := 4;
+  constant C_INTERPOLATOR_DELAY : integer := 0;
 
   -- derived constants
   constant C_LUT_BRAM_WIDTH : integer := C_BASE_BITS+C_INCLINE_BITS;
@@ -212,6 +213,15 @@ package body lut_package is
       d := d+1;
     end if;
     return d;
+  end function;
+
+  function max(x:integer; y:integer) return integer is
+  begin
+    if x>y then 
+      return x; 
+    else 
+      return y; 
+    end if;
   end function;
 
 end package body;

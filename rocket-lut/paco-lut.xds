@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<DesignStrategy goal="Balanced" strategy="PACO LUT" version="12.1">
+
+  <Description>Based on Xilinx' default, this strategy disables the use of DSP blocks.</Description>
+
+  <DeviceList devices="virtex6"/>
+
+  <Properties>
+    <property name="Synthesize - XST:DSP Utilization Ratio" value="0"/>
+    <property name="Synthesize - XST:Use DSP Block" value="No"/>
+  </Properties>
+
+</DesignStrategy>
