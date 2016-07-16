@@ -50,6 +50,8 @@ architecture implementation of ht_lut_core is
 
   signal input: std_logic_vector(C_INPUT_WORD_SIZE-1 downto 0);
   signal input_counter : integer;
+
+  signal clock_counter : integer;
   
 begin
   
@@ -135,6 +137,11 @@ begin
                 state_post_rx <= CFG_EXEC;
                 state_post_tx <= IDLE;
                 state <= RX_WORD;
+
+              when CMD_DIAG_CLOCK_COUNTER => 
+                state_post_tx <= IDLE;
+                state <= TX_WORD;
+                word <= conv_std_logic_vector(clock_counter,32);
 
               when CMD_CFG_INPUT_WORDS =>
                 tx_valid <= '1';
@@ -229,7 +236,9 @@ begin
           i_signals.data3_i <= input(C_WORD_SIZE*3-1 downto C_WORD_SIZE*2);
           i_signals.id_exe_i <= '1';
           state <= EXE_WAIT;
+          clock_counter <= 0;
         when EXE_WAIT => 
+          clock_counter <= clock_counter +1;
           if o_signals.data_valid_o='1' then
             word <= o_signals.data_o;
             state <= TX_WORD;

@@ -23,6 +23,8 @@ package test_package is
   constant CMD_CORE_EXE : std_logic_vector(7 downto 0) := x"32";
   constant CMD_CORE_CFG : std_logic_vector(7 downto 0) := x"33";
 
+  constant CMD_DIAG_CLOCK_COUNTER : std_logic_vector(7 downto 0) := x"40";
+
   constant CMD_CFG_INPUT_WORDS : std_logic_vector(7 downto 0) := x"0b";
   constant CMD_CFG_SELECTOR_BITS : std_logic_vector(7 downto 0) := x"02";
   constant CMD_CFG_INTERPOLATION_BITS : std_logic_vector(7 downto 0) := x"03";
