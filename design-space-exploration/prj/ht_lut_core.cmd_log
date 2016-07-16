@@ -1,0 +1,6 @@
+xst -intstyle ise -ifn "ht_lut_core.xst" -ofn "ht_lut_core.syr" 
+ngdbuild -intstyle ise -dd _ngo -nt timestamp -uc ../ht_lut_core.ucf -p xc6vlx240t-ff1156-1 ht_lut_core.ngc ht_lut_core.ngd  
+map -intstyle ise -p xc6vlx240t-ff1156-1 -w -logic_opt off -ol high -t 1 -xt 0 -register_duplication off -r 4 -global_opt off -mt off -ir off -pr off -lc off -power off -o ht_lut_core_map.ncd ht_lut_core.ngd ht_lut_core.pcf 
+par -w -intstyle ise -ol high -mt off ht_lut_core_map.ncd ht_lut_core.ncd ht_lut_core.pcf 
+trce -intstyle ise -v 3 -s 1 -n 3 -fastpaths -xml ht_lut_core.twx ht_lut_core.ncd -o ht_lut_core.twr ht_lut_core.pcf 
+bitgen -intstyle ise -f ht_lut_core.ut ht_lut_core.ncd 
