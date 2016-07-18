@@ -25,6 +25,22 @@ with open("lut_package.vhd","r") as f:
 
 suffix=("-%s"%"-".join(["%s"%data[field] for field in fields]))
 
+fOverwrite=False
+try:
+  s=None
+  for arg in sys.argv[1:]:
+    if s==None:
+      if arg[:1]=="-":
+        if arg in {"-f","--force","--overwrite"}: fOverwrite=True
+        else:
+          raise Exception("unknown switch: %s"%arg)
+      else:
+        raise Exception("stray argument: %s"%arg)
+          
+except Exception as e:
+  sys.stderr.write("\x1b[31;1mERROR\x1b[30;0m: %s\n"%e)
+  sys.exit(1)
+
 for fn in os.listdir("rocket-lut"):
   (fc,fe)=os.path.splitext(fn)
   if fe!=".bit":
@@ -39,7 +55,8 @@ for fn in os.listdir("rocket-lut"):
         "\x1b[33;1mWARNING\x1b[30;0m: "
         "bitstream file %s exists already (AND differs from %s)"
         %(fn_trg,fn_src))
-    continue
+    if not fOverwrite:
+      continue
   print(
     "\x1b[34;1mCOPYING\x1b[30;0m: %s -> %s"
     %(fn_src,fn_trg))
