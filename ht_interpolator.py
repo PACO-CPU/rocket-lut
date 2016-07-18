@@ -4,18 +4,6 @@ import sys
 import math
 import random
 import time
-
-def incline_sex(incline):
-  if incline&(1<<(iface.INCLINE_BITS-1)):
-    incline=incline-(1<<iface.INCLINE_BITS)
-  return incline
-
-def sim(selector,interpolator,base,incline):
-  incline=incline_sex(incline)
-  mult=(selector<<iface.INTERPOLATION_BITS) | interpolator
-
-  return (base+mult*incline)&0xffffffff
-
 # command-line argument handling
 randomInputCount=100000
 port="/dev/ttyUSB0"
@@ -46,6 +34,7 @@ except Exception as e:
 
 # execution
 iface=htlib.IFace(port,baudrate)
+ctrl=htlib.InterControl(iface)
 
 
 # test i/o
@@ -55,27 +44,17 @@ iface.test_echo()
 # retrieve architecture specifics
 print("\x1b[34;1mRunning\x1b[30;0m: load config")
 iface.load_config()
-print("  word size: .............. %s"%iface.WORD_SIZE)
-print("  selector bits: .......... %s"%iface.SELECTOR_BITS)
-print("  interpolation bits: ..... %s"%iface.INTERPOLATION_BITS)
-print("  segment bits: ........... %s"%iface.SEGMENT_BITS)
-print("  pla interconnects: ...... %s"%iface.PLA_INTERCONNECTS)
-print("  base bits: .............. %s"%iface.BASE_BITS)
-print("  incline bits: ........... %s"%iface.INCLINE_BITS)
-print("  address translator delay: %s"%iface.ADDRESS_TRANSLATOR_DELAY)
-print("  interpolator delay: ..... %s"%iface.INTERPOLATOR_DELAY)
+iface.print_config()
 
 # automatically generate and test decoder configurations
 print(
   "\x1b[34;1mRunning\x1b[30;0m: automatic test (%i points)"
   %(randomInputCount))
 random.seed(time.time())
+sim=ctrl.inter_compile()
 with htlib.ProgressBar(0,randomInputCount) as pb_input:
   for i in range(randomInputCount):
-    selector=random.randint(0,(1<<(iface.SELECTOR_BITS))-1)
-    interpolator=random.randint(0,(1<<(iface.INTERPOLATION_BITS))-1)
-    base=random.randint(0,(1<<(iface.BASE_BITS))-1)
-    incline=random.randint(0,(1<<(iface.INCLINE_BITS))-1)
+    (selector,interpolator,base,incline)=ctrl.random_inter_input()
     y_sim=sim(selector,interpolator,base,incline)
     y_inter=iface.command_inter(
       htlib.CMD_COMPUTE_INTER,selector,interpolator,base,incline)

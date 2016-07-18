@@ -5,37 +5,6 @@ import math
 import random
 import time
 
-def choices_compile(*args):
-  
-  choices=[
-    0 if i>=len(args) else 1<<args[i]
-    for i in range(iface.SELECTOR_BITS+iface.INTERPOLATION_BITS)]
-
-  def sim(x):
-    bits=[ 
-      (x>>i)&1 
-      for i in range(iface.INPUT_WORD_SIZE)]
-    r=0
-    for i,arg in enumerate(args):
-      r+=bits[arg]<<i
-    return r 
-  return choices,sim
-
-def choices_words(choices):
-  nwords=iface.CFG_INPUT_DECODER_REGISTERS_PER_BIT
-  words=sum([
-    [ (v>>(32*shamt))&((1<<iface.CFG_WORD_SIZE)-1) for shamt in range(nwords) ]
-    for v in choices
-  ],[])
-  return words
-
-
-def config_hw(*args):
-  (choices,sim)=choices_compile(*args)
-  words=choices_words(choices)
-  for w in reversed(words):
-    iface.command(htlib.CMD_CFG_WORD,w)
-
 # command-line argument handling
 randomConfigCount=1000
 randomInputCount=1000
@@ -67,7 +36,7 @@ except Exception as e:
 
 # execution
 iface=htlib.IFace(port,baudrate)
-
+ctrl=htlib.IDECControl(iface)
 
 # test i/o
 print("\x1b[34;1mRunning\x1b[30;0m: echo test")
@@ -76,17 +45,7 @@ iface.test_echo()
 # retrieve architecture specifics
 print("\x1b[34;1mRunning\x1b[30;0m: load config")
 iface.load_config()
-print("  word size: .............. %s"%iface.WORD_SIZE)
-print("  input words: ............ %s"%iface.INPUT_WORDS)
-print("  selector bits: .......... %s"%iface.SELECTOR_BITS)
-print("  interpolation bits: ..... %s"%iface.INTERPOLATION_BITS)
-print("  segment bits: ........... %s"%iface.SEGMENT_BITS)
-print("  pla interconnects: ...... %s"%iface.PLA_INTERCONNECTS)
-print("  base bits: .............. %s"%iface.BASE_BITS)
-print("  incline bits: ........... %s"%iface.INCLINE_BITS)
-print("  input decoder delay: .... %s"%iface.INPUT_DECODER_DELAY)
-print("  address translator delay: %s"%iface.ADDRESS_TRANSLATOR_DELAY)
-print("  interpolator delay: ..... %s"%iface.INTERPOLATOR_DELAY)
+iface.print_config()
 
 # test configuration stream
 print("\x1b[34;1mRunning\x1b[30;0m: config test")
@@ -104,15 +63,13 @@ print(
 random.seed(time.time())
 with htlib.ProgressBar(0,randomConfigCount) as pb_idec:
   for i_cfg in range(randomConfigCount):
-    choices=[
-      random.randint(0,iface.INPUT_WORDS*iface.WORD_SIZE-1) 
-      for i in range(iface.SELECTOR_BITS+iface.INTERPOLATION_BITS)]
-    (words,sim)=choices_compile(*choices)
-    config_hw(*choices)
+    choices=ctrl.random_idec()
+    (words,sim)=ctrl.idec_compile(*choices)
+    ctrl.config_idec(*choices)
     
     with htlib.ProgressBar(0,randomInputCount,parent=pb_idec) as pb_input:
       for i_input in range(randomInputCount):
-        x=random.randint(0,(1<<(iface.WORD_SIZE*iface.INPUT_WORDS))-1)
+        x=ctrl.random_idec_input()
         y_sim=sim(x)
         y_idec=iface.commandi(htlib.CMD_COMPUTE_IDEC,x)
         if y_sim!=y_idec:

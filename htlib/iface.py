@@ -113,7 +113,19 @@ class IFace(serial.Serial):
           "config did not return the correct word when shifting over: "
           "expected %.8x, got %.8x"
           %(i+1024,old))
-
+  
+  def print_config(s):
+    print("  word size: .............. %s"%s.WORD_SIZE)
+    print("  input words: ............ %s"%s.INPUT_WORDS)
+    print("  selector bits: .......... %s"%s.SELECTOR_BITS)
+    print("  interpolation bits: ..... %s"%s.INTERPOLATION_BITS)
+    print("  segment bits: ........... %s"%s.SEGMENT_BITS)
+    print("  pla interconnects: ...... %s"%s.PLA_INTERCONNECTS)
+    print("  base bits: .............. %s"%s.BASE_BITS)
+    print("  incline bits: ........... %s"%s.INCLINE_BITS)
+    print("  input decoder delay: .... %s"%s.INPUT_DECODER_DELAY)
+    print("  address translator delay: %s"%s.ADDRESS_TRANSLATOR_DELAY)
+    print("  interpolator delay: ..... %s"%s.INTERPOLATOR_DELAY)
 
   @property
   def WORD_SIZE(s):
@@ -226,3 +238,10 @@ class IFace(serial.Serial):
   def CFG_REGISTER_COUNT(s):
     return s.CFG_LUT_REGISTER_COUNT+s.CFG_CHAIN_REGISTER_COUNT
 
+class IFaceRef:
+  def __init__(s,iface):
+    s._iface=iface
+
+  @property
+  def iface(s):
+    return s._iface
