@@ -42,7 +42,9 @@ class IFace(serial.Serial):
     s._base_bits=48
     s._incline_bits=32
     s._input_words=1
-  
+    
+    s._controller_delay=1
+    s._input_decoder_delay=1
     s._address_translator_delay=1
     s._interpolator_delay=4
 

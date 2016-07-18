@@ -101,7 +101,7 @@ for j in range(iface.CFG_REGISTER_COUNT):
 ctrl.core_assert(raw=(iface.CFG_REGISTER_COUNT<<8)|0x00)
 ctrl.core_exec(12,True)
 ctrl.core_assert(raw=(iface.CFG_REGISTER_COUNT<<8)|0x00)
-print("\r  delay: %s"%(iface.command(htlib.CMD_DIAG_CLOCK_COUNTER)))
+print("\n  delay: %s"%(iface.command(htlib.CMD_DIAG_CLOCK_COUNTER)))
 
 iface.command0(htlib.CMD_CORE_CFG,0xaffedead)
 ctrl.core_assert(raw=(iface.CFG_REGISTER_COUNT<<8)|0x01)
