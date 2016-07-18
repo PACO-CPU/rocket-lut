@@ -1,5 +1,11 @@
 
-NET "CLK"                      LOC = "J9";     ## 4   on U11, 4 on U89 (DNP)
+NET "CLK_N" TNM_NET = CLK;
+NET "CLK_P" TNM_NET = CLK;
+TIMESPEC TS_CLK = PERIOD CLK 200 MHz;
+
+NET "CLK_N"                      LOC = "H9";     ## 5   on U11, 5 on U89 (DNP)
+NET "CLK_P"                      LOC = "J9";     ## 4   on U11, 4 on U89 (DNP)
+
 NET "RST"                      LOC = "G26";    ## 2   on SW10 pushbutton (active-High)
 NET "RST" CLOCK_DEDICATED_ROUTE = "FALSE";
 

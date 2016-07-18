@@ -9,7 +9,7 @@ library paco_lut;
 use paco_lut.lut_package.all;
 
 package test_package is
-  constant C_CLK_FREQ : integer := 200000000;
+  constant C_CLK_FREQ : integer := 100000000;
   constant C_BAUD_RATE : integer := 921600;
 
   constant CMD_ECHO : std_logic_vector(7 downto 0) := x"01";

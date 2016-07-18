@@ -8,7 +8,8 @@ use paco_lut.test_package.all;
 
 entity ht_address_translator is
   port (
-    clk : in std_logic;
+    clk_p : in std_logic;
+    clk_n : in std_logic;
     rst : in std_logic;
 
     rxd : in std_logic;
@@ -18,6 +19,8 @@ entity ht_address_translator is
 end entity;
 
 architecture implementation of ht_address_translator is
+  signal clk : std_logic;
+
   signal word : std_logic_vector(31 downto 0);
   signal word_counter : integer;
 
@@ -41,6 +44,12 @@ architecture implementation of ht_address_translator is
 
 begin
   
+  clkdiv: entity work.clk_divider port map (
+    CLK_IN1_P => clk_p,
+    CLK_IN1_N => clk_n,
+    CLK_OUT1 => clk
+  );
+
   i_signals.id_rst_i <= rst;
   uut: address_translator port map (
     clk => clk,
