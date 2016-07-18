@@ -39,6 +39,7 @@ def config_hw(*args):
 # command-line argument handling
 randomConfigCount=1000
 randomInputCount=1000
+configTestCount=10
 port="/dev/ttyUSB0"
 baudrate=921600
 
@@ -67,7 +68,7 @@ except Exception as e:
 
 # execution
 iface=htlib.IFace(port,baudrate)
-
+ctrl=htlib.LUTCoreControl(iface)
 
 # test i/o
 print("\x1b[34;1mRunning\x1b[30;0m: echo test")
@@ -76,53 +77,70 @@ iface.test_echo()
 # retrieve architecture specifics
 print("\x1b[34;1mRunning\x1b[30;0m: load config")
 iface.load_config()
-print("  word size: .............. %s"%iface.WORD_SIZE)
-print("  input words: ............ %s"%iface.INPUT_WORDS)
-print("  selector bits: .......... %s"%iface.SELECTOR_BITS)
-print("  interpolation bits: ..... %s"%iface.INTERPOLATION_BITS)
-print("  segment bits: ........... %s"%iface.SEGMENT_BITS)
-print("  pla interconnects: ...... %s"%iface.PLA_INTERCONNECTS)
-print("  base bits: .............. %s"%iface.BASE_BITS)
-print("  incline bits: ........... %s"%iface.INCLINE_BITS)
-print("  input decoder delay: .... %s"%iface.INPUT_DECODER_DELAY)
-print("  address translator delay: %s"%iface.ADDRESS_TRANSLATOR_DELAY)
-print("  interpolator delay: ..... %s"%iface.INTERPOLATOR_DELAY)
+iface.print_config()
 
-# test configuration stream
-print("\x1b[34;1mRunning\x1b[30;0m: config test")
-iface.test_config(iface.CFG_INPUT_DECODER_REGISTER_COUNT)
+# status test
+print("\x1b[34;1mRunning\x1b[30;0m: status test")
+ctrl.core_reset()
+ctrl.core_assert(raw=0)
 
-def fmt_bv(x,cb):
-  bv=("{0:%ib}"%cb).format(x)
-  bv=" ".join([bv[i:i+8] for i in range(0,len(bv),8)])
-  return bv
+for i in range(configTestCount):
+  sys.stdout.write("  %i "%i)
+  n=random.randint(1,iface.CFG_REGISTER_COUNT);
+  for j in range(n):
+    iface.command0(htlib.CMD_CORE_CFG,0xaffedead)
+    ctrl.core_assert(raw=(j+1)<<8)
+    sys.stdout.write("\r  %i/%i: %.2f%%"%(i+1,configTestCount,(j+1/n)*100.0))
+  ctrl.core_reset()
+  ctrl.core_assert(raw=0)
+sys.stdout.write("\r")
+
+for j in range(iface.CFG_REGISTER_COUNT):
+  iface.command0(htlib.CMD_CORE_CFG,0xaffedead)
+
+ctrl.core_assert(raw=(iface.CFG_REGISTER_COUNT<<8)|0x00)
+ctrl.core_exec(12,True)
+ctrl.core_assert(raw=(iface.CFG_REGISTER_COUNT<<8)|0x00)
+print("\r  delay: %s"%(iface.command(htlib.CMD_DIAG_CLOCK_COUNTER)))
+
+iface.command0(htlib.CMD_CORE_CFG,0xaffedead)
+ctrl.core_assert(raw=(iface.CFG_REGISTER_COUNT<<8)|0x01)
+ctrl.core_exec_begin(12)
+ctrl.core_assert(raw=(iface.CFG_REGISTER_COUNT<<8)|0x03)
+
+ctrl.core_reset()
+ctrl.core_assert(raw=0)
+
 
 # automatically generate and test decoder configurations
 print(
   "\x1b[34;1mRunning\x1b[30;0m: automatic test (%i configs, %i points)"
   %(randomConfigCount,randomInputCount))
 random.seed(time.time())
-with htlib.ProgressBar(0,randomConfigCount) as pb_idec:
+with htlib.ProgressBar(0,randomConfigCount) as pb_cfg:
   for i_cfg in range(randomConfigCount):
-    choices=[
-      random.randint(0,iface.INPUT_WORDS*iface.WORD_SIZE-1) 
-      for i in range(iface.SELECTOR_BITS+iface.INTERPOLATION_BITS)]
-    (words,sim)=choices_compile(*choices)
-    config_hw(*choices)
-    
-    with htlib.ProgressBar(0,randomInputCount,parent=pb_idec) as pb_input:
+    specification=ctrl.random_core()
+    intermediate=ctrl.core_compile(specification)
+    ctrl.core_reset()
+    ctrl.config_core(specification)
+
+    with htlib.ProgressBar(0,randomInputCount,parent=pb_cfg) as pb_input:
       for i_input in range(randomInputCount):
-        x=random.randint(0,(1<<(iface.WORD_SIZE*iface.INPUT_WORDS))-1)
-        y_sim=sim(x)
-        y_idec=iface.commandi(htlib.CMD_COMPUTE_IDEC,x)
-        if y_sim!=y_idec:
+        x=ctrl.random_core_input()
+        y_sim=intermediate.sim(x)
+        y_phy=ctrl.core_exec(x)
+        #y_idec=iface.command
+        if y_sim!=y_phy:
+          # todo: error output
           sys.stderr.write(
             "\r\x1b[31;1mERROR\x1b[30;0m: "
-            "mismatch (code: <%s>)\n  x:      %s\n  y_sim:  %s\n  y_idec: %s\n"
-            %(" ".join([str(v) for v in choices]),
-            fmt_bv(x,iface.INPUT_WORDS*iface.WORD_SIZE),
-            fmt_bv(y_sim,iface.SELECTOR_BITS+iface.INTERPOLATION_BITS),
-            fmt_bv(y_idec,iface.SELECTOR_BITS+iface.INTERPOLATION_BITS)))
+            "mismatch (x: 0x%x, y_sim=0x%x, y_phy=0x%x)\n"
+            %(x,y_sim,y_phy))
+        elif False:
+          sys.stderr.write(
+            "\r\x1b[32;1mSUCCESS\x1b[30;0m: "
+            "(x: 0x%x, y_sim=0x%x, y_phy=0x%x)\n"
+            %(x,y_sim,y_phy))
         pb_input.increment(1)
 
 

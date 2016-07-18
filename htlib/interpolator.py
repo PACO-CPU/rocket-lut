@@ -1,8 +1,10 @@
 from .iface import *
 import random
+from collections import namedtuple
 
 class InterControl(IFaceRef):
-  
+  intermediate_t=namedtuple("inter_intermediate_t","sim")
+
   def random_inter_input(s):
     
     selector=random.randint(0,(1<<(s.iface.SELECTOR_BITS))-1)

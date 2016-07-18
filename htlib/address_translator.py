@@ -1,7 +1,9 @@
 from .iface import *
 import random
+from collections import namedtuple
 
 class PLAControl(IFaceRef):
+  intermediate_t=namedtuple("pla_intermediate_t","and_plane or_plane sim")
   
   def random_pla(s):
     code=[

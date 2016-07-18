@@ -51,8 +51,7 @@ begin
   error_o <= '1' when state=STATE_ERROR else '0';
   
   lut_data_o <= cfg_ram_buffer(
-    C_RAM_CONFIG_BUFFER_SIZE_BITS - 1 downto 
-    C_RAM_CONFIG_BUFFER_SIZE_BITS - C_LUT_BRAM_WIDTH);
+    C_LUT_BRAM_WIDTH-1 downto 0);
   lut_we_o   <= cfg_ram_we;
 
   process(clk) is 
@@ -68,9 +67,7 @@ begin
       cfg_o.valid <= '0';
       cfg_mode_o  <= '0';
 
-      ram_buffer_offset := 
-        C_RAM_CONFIG_BUFFER_SIZE_BITS-1
-        -(cfg_ram_buffer_counter mod C_RAM_CONFIG_BUFFER_SIZE)*C_CFG_WORD_SIZE;
+      ram_buffer_offset := cfg_ram_buffer_counter*C_CFG_WORD_SIZE;
 
       -- the following signals are also used only in special cases but otherwise
       -- they are don't cares: 
@@ -119,7 +116,7 @@ begin
           when STATE_CFG_RAM =>
             
             cfg_ram_buffer(
-              ram_buffer_offset downto ram_buffer_offset-C_CFG_WORD_SIZE+1) <=
+              ram_buffer_offset+C_CFG_WORD_SIZE-1 downto ram_buffer_offset) <=
               data_i(C_CFG_WORD_SIZE-1 downto 0);
 
             cfg_count <= cfg_count +1;
@@ -154,6 +151,7 @@ begin
         end case;
 
       elsif id_exe_i='1' then -- perform an execute instruction
+        -- todo: add a generic (constant) to turn off this delay slot
         case state is
           when STATE_READY =>
             pipeline_o.data <= data_i;

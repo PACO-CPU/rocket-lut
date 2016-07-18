@@ -19,6 +19,16 @@ CMD_CFG_INCLINE_BITS = 0x07
 CMD_CFG_INPUT_DECODER_DELAY = 0x0a
 CMD_CFG_ADDRESS_TRANSLATOR_DELAY = 0x08
 CMD_CFG_INTERPOLATOR_DELAY = 0x09
+
+CMD_CORE_RST = 0x30
+CMD_CORE_STAT = 0x31
+CMD_CORE_EXE = 0x32
+CMD_CORE_CFG = 0x33
+CMD_CORE_EXE_BEGIN = 0x34
+
+CMD_DIAG_CLOCK_COUNTER = 0x40
+CMD_DIAG_OUTPUT_COUNTER = 0x41
+
 class IFace(serial.Serial):
   
   def __init__(s,port,baud):
@@ -34,15 +44,35 @@ class IFace(serial.Serial):
   
     s._address_translator_delay=1
     s._interpolator_delay=4
-  
-  def command8(s,cmd):
-    raw=struct.pack("<B",cmd)
+
+  def command0(s,cmd,data=None):
+    if data==None:
+      raw=struct.pack("<B",cmd)
+    else:
+      raw=struct.pack("<BI",cmd,data)
+    s.write(raw)
+
+  def command0i(s,cmd,data=None):
+    words=[
+      (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
+      for shamt in reversed(range(s.INPUT_WORDS))]
+    raw=struct.pack("<B%s"%("I"*s.INPUT_WORDS),cmd,*words)
+    s.write(raw)
+
+  def command8(s,cmd,data=None):
+    if data==None:
+      raw=struct.pack("<B",cmd)
+    else:
+      raw=struct.pack("<BI",cmd,data)
     s.write(raw)
     raw=s.read(1)
     return struct.unpack("<B",raw)[0]
     
-  def command(s,cmd,data):
-    raw=struct.pack("<BI",cmd,data)
+  def command(s,cmd,data=None):
+    if data==None:
+      raw=struct.pack("<B",cmd)
+    else:
+      raw=struct.pack("<BI",cmd,data)
     s.write(raw)
     raw=s.read(4)
     return struct.unpack("<I",raw)[0]
@@ -59,16 +89,6 @@ class IFace(serial.Serial):
 
     raw=bytes([cmd]+[(word>>(8*shamt))&0xff for shamt in range(byte_count)])
     
-    if False:
-      word_count=math.ceil(
-        (s.SELECTOR_BITS+s.INTERPOLATION_BITS+s.BASE_BITS+s.INCLINE_BITS)/32)
-
-      words=[
-        (word>>(32*shamt))&0xffffffff 
-        for shamt in reversed(range(word_count))]
-
-      raw=struct.pack("<B%s"%("I"*word_count),cmd,*words)
-      
     s.write(raw)
     raw=s.read(4)
     return struct.unpack("<I",raw[:4])[0]
@@ -77,6 +97,7 @@ class IFace(serial.Serial):
     words=[
       (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
       for shamt in reversed(range(s.INPUT_WORDS))]
+      
     raw=struct.pack("<B%s"%("I"*s.INPUT_WORDS),cmd,*words)
     s.write(raw)
     raw=s.read(4)
@@ -181,11 +202,11 @@ class IFace(serial.Serial):
 
   @property
   def LUT_BRAM_WIDTH(s):
-    return s.RAM_CONFIG_BUFFER_SIZE*(1<<s.SEGMENT_BITS)
+    return s.BASE_BITS+s.INCLINE_BITS
 
   @property
   def RAM_CONFIG_BUFFER_SIZE(s):
-    return math.ceil(s.LUT_BRAM_WIDTH/CFG_WORD_SIZE)
+    return math.ceil(s.LUT_BRAM_WIDTH/s.CFG_WORD_SIZE)
 
   @property
   def RAM_CONFIG_BUFFER_SIZE_BITS(s):

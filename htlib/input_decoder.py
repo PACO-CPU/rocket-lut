@@ -1,8 +1,11 @@
 from .iface import *
 import random
+from collections import namedtuple
 
 class IDECControl(IFaceRef):
   
+  intermediate_t=namedtuple("idec_intermediate_t","choices sim")
+
   def random_idec(s):
     choices=[
       random.randint(0,s.iface.INPUT_WORDS*s.iface.WORD_SIZE-1) 
@@ -13,7 +16,6 @@ class IDECControl(IFaceRef):
     return random.randint(0,(1<<(s.iface.WORD_SIZE*s.iface.INPUT_WORDS))-1)
 
   def idec_compile(s,*args):
-    
     choices=[
       0 if i>=len(args) else 1<<args[i]
       for i in range(s.iface.SELECTOR_BITS+s.iface.INTERPOLATION_BITS)]
