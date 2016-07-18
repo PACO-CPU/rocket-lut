@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+import re,sys,os,shutil
+
+e=re.compile(r"\s*constant\s*C_([A-Z_0-9]+)\s*:\s*integer\s*:=\s*([0-9]+?)\s*;$")
+
+data=dict()
+
+fields=[
+  "SELECTOR_BITS",
+  "INTERPOLATION_BITS",
+  "SEGMENT_BITS",
+  "PLA_INTERCONNECTS",
+  "BASE_BITS",
+  "INCLINE_BITS",
+  "INPUT_DECODER_DELAY",
+  "ADDRESS_TRANSLATOR_DELAY",
+  "INTERPOLATOR_DELAY"
+]
+with open("lut_package.vhd","r") as f:
+  for ln in f:
+    m=e.match(ln.strip())
+    if m:
+      g=m.groups()
+      data[g[0]]=int(g[1])
+
+suffix=("-%s"%"-".join(["%s"%data[field] for field in fields]))
+
+for fn in os.listdir("rocket-lut"):
+  (fc,fe)=os.path.splitext(fn)
+  if fe!=".bit":
+    continue
+  
+  fn_src="rocket-lut/%s"%fn
+  fn_trg="bitstreams/%s%s%s"%(fc,suffix,fe)
+  if os.path.exists(fn_trg):
+    res=os.system("diff \"%s\" \"%s\" -q > /dev/null"%(fn_src,fn_trg))
+    if res!=0:
+      print(
+        "\x1b[33;1mWARNING\x1b[30;0m: "
+        "bitstream file %s exists already (AND differs from %s)"
+        %(fn_trg,fn_src))
+    continue
+  print(
+    "\x1b[34;1mCOPYING\x1b[30;0m: %s -> %s"
+    %(fn_src,fn_trg))
+  shutil.copy(fn_src,fn_trg)
