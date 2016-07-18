@@ -14,9 +14,9 @@ entity lut_core is
     id_stat_i : in std_logic;
     id_exe_i : in std_logic;
     id_cfg_i : in std_logic;
-    data_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- rs
-    data2_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- rt
-    data3_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- ru
+    data_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- rs1
+    data2_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- rs2
+    data3_i : in std_logic_vector(C_WORD_SIZE-1 downto 0); -- rs3
 
     data_o : out std_logic_vector(C_WORD_SIZE-1 downto 0); -- rd
     data_valid_o : out std_logic;

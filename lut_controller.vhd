@@ -120,7 +120,7 @@ begin
             
             cfg_ram_buffer(
               ram_buffer_offset downto ram_buffer_offset-C_CFG_WORD_SIZE+1) <=
-              data_i;
+              data_i(C_CFG_WORD_SIZE-1 downto 0);
 
             cfg_count <= cfg_count +1;
             
