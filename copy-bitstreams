@@ -14,7 +14,8 @@ fields=[
   "INCLINE_BITS",
   "INPUT_DECODER_DELAY",
   "ADDRESS_TRANSLATOR_DELAY",
-  "INTERPOLATOR_DELAY"
+  "INTERPOLATOR_DELAY",
+  "CONTROLLER_DELAY"
 ]
 with open("lut_package.vhd","r") as f:
   for ln in f:

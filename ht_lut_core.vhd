@@ -200,6 +200,9 @@ begin
               when CMD_CFG_INCLINE_BITS =>
                 tx_valid <= '1';
                 tx_data <= conv_std_logic_vector(C_INCLINE_BITS,8);
+              when CMD_CFG_CONTROLLER_DELAY =>
+                tx_valid <= '1';
+                tx_data <= conv_std_logic_vector(C_CONTROLLER_DELAY,8);
               when CMD_CFG_INPUT_DECODER_DELAY =>
                 tx_valid <= '1';
                 tx_data <= conv_std_logic_vector(C_INPUT_DECODER_DELAY,8);

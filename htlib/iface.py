@@ -16,6 +16,7 @@ CMD_CFG_SEGMENT_BITS = 0x04
 CMD_CFG_PLA_INTERCONNECTS = 0x05
 CMD_CFG_BASE_BITS = 0x06
 CMD_CFG_INCLINE_BITS = 0x07
+CMD_CFG_CONTROLLER_DELAY = 0x0c
 CMD_CFG_INPUT_DECODER_DELAY = 0x0a
 CMD_CFG_ADDRESS_TRANSLATOR_DELAY = 0x08
 CMD_CFG_INTERPOLATOR_DELAY = 0x09
@@ -112,6 +113,7 @@ class IFace(serial.Serial):
     s._base_bits=s.command8(CMD_CFG_BASE_BITS)
     s._incline_bits=s.command8(CMD_CFG_INCLINE_BITS)
 
+    s._controller_delay=s.command8(CMD_CFG_CONTROLLER_DELAY)
     s._input_decoder_delay=s.command8(CMD_CFG_INPUT_DECODER_DELAY)
     s._address_translator_delay=s.command8(CMD_CFG_ADDRESS_TRANSLATOR_DELAY)
     s._interpolator_delay=s.command8(CMD_CFG_INTERPOLATOR_DELAY)
@@ -144,6 +146,7 @@ class IFace(serial.Serial):
     print("  pla interconnects: ...... %s"%s.PLA_INTERCONNECTS)
     print("  base bits: .............. %s"%s.BASE_BITS)
     print("  incline bits: ........... %s"%s.INCLINE_BITS)
+    print("  controller delay: ....... %s"%s.CONTROLLER_DELAY)
     print("  input decoder delay: .... %s"%s.INPUT_DECODER_DELAY)
     print("  address translator delay: %s"%s.ADDRESS_TRANSLATOR_DELAY)
     print("  interpolator delay: ..... %s"%s.INTERPOLATOR_DELAY)
@@ -183,6 +186,10 @@ class IFace(serial.Serial):
   @property
   def INCLINE_BITS(s):
     return s._incline_bits
+
+  @property
+  def CONTROLLER_DELAY(s):
+    return s._controller_delay
 
   @property
   def INPUT_DECODER_DELAY(s):

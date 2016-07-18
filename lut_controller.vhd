@@ -46,6 +46,9 @@ architecture implementation of lut_controller is
   signal e_invalid_cfg   : std_logic;
   signal e_premature_exe : std_logic;
   signal e_instr_code    : std_logic;
+  
+  type p_delay_t is array(0 to C_CONTROLLER_DELAY) of p_input_t;
+  signal p_delay : p_delay_t;
 begin 
   
   error_o <= '1' when state=STATE_ERROR else '0';
@@ -53,6 +56,11 @@ begin
   lut_data_o <= cfg_ram_buffer(
     C_LUT_BRAM_WIDTH-1 downto 0);
   lut_we_o   <= cfg_ram_we;
+
+  p_delay(0).valid <= id_exe_i;
+  p_delay(0).data <= data_i;
+
+  pipeline_o <= p_delay(C_CONTROLLER_DELAY);
 
   process(clk) is 
     -- highest bit of the ram buffer that needs to be written next
@@ -62,7 +70,6 @@ begin
     if rising_edge(clk) then
       
       -- some signals are set only in special circumstances. Reset them here:
-      pipeline_o.valid <= '0';
       cfg_ram_we  <= '0';
       cfg_o.valid <= '0';
       cfg_mode_o  <= '0';
@@ -84,6 +91,10 @@ begin
         when others => 
           null;
       end case;
+
+      for i in 1 to C_CONTROLLER_DELAY loop
+        p_delay(i) <= p_delay(i-1);
+      end loop;
       
       -- we do not check if multiple id_*_i fields are set here because
       -- it's just some overhead we do not need right now.
@@ -151,11 +162,9 @@ begin
         end case;
 
       elsif id_exe_i='1' then -- perform an execute instruction
-        -- todo: add a generic (constant) to turn off this delay slot
         case state is
           when STATE_READY =>
-            pipeline_o.data <= data_i;
-            pipeline_o.valid <= '1';
+            null;
 
           when others =>
             state <= STATE_ERROR;

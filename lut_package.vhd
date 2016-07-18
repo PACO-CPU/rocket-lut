@@ -26,6 +26,7 @@ package lut_package is
   constant C_INCLINE_BITS : integer := 32;
 
   -- realization-specifics (delay steps etc)
+  constant C_CONTROLLER_DELAY : integer := 0;
   constant C_INPUT_DECODER_DELAY : integer := 0;
   constant C_ADDRESS_TRANSLATOR_DELAY : integer := 0;
   constant C_INTERPOLATOR_DELAY : integer := 0;

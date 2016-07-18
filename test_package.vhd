@@ -34,6 +34,7 @@ package test_package is
   constant CMD_CFG_PLA_INTERCONNECTS : std_logic_vector(7 downto 0) := x"05";
   constant CMD_CFG_BASE_BITS : std_logic_vector(7 downto 0) := x"06";
   constant CMD_CFG_INCLINE_BITS : std_logic_vector(7 downto 0) := x"07";
+  constant CMD_CFG_CONTROLLER_DELAY : std_logic_vector(7 downto 0) := x"0c";
   constant CMD_CFG_ADDRESS_TRANSLATOR_DELAY : std_logic_vector(7 downto 0) := x"08";
   constant CMD_CFG_INTERPOLATOR_DELAY : std_logic_vector(7 downto 0) := x"09";
   constant CMD_CFG_INPUT_DECODER_DELAY : std_logic_vector(7 downto 0) := x"0a";
