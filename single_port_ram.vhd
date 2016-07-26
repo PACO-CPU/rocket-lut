@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_signed.all;
 use ieee.std_logic_arith.all;
 
-library paco_lut;
+library work;
 
 entity single_port_ram is
   generic (

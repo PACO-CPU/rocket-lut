@@ -5,18 +5,18 @@ use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_misc.all;
 
-library paco_lut;
+library work;
 
 package lut_package is
 
   function cdiv(x:positive; y:positive) return natural;
   function max(x:integer; y:integer) return integer;
-  
+
   -- Embedding-specific constants (Rocket Chip/SoC)
   constant C_WORD_SIZE : integer := 32;
   constant C_CFG_WORD_SIZE : integer := C_WORD_SIZE;
   constant C_INPUT_WORDS : integer := 3;
-  
+
   -- LUT HW core specifics
   constant C_SELECTOR_BITS : integer := 8;
   constant C_INTERPOLATION_BITS : integer := 8;
@@ -34,24 +34,24 @@ package lut_package is
   -- derived constants
   constant C_INPUT_WORD_SIZE : integer := C_WORD_SIZE*C_INPUT_WORDS;
   constant C_LUT_BRAM_WIDTH : integer := C_BASE_BITS+C_INCLINE_BITS;
-  constant C_RAM_CONFIG_BUFFER_SIZE : integer 
+  constant C_RAM_CONFIG_BUFFER_SIZE : integer
     := cdiv(C_LUT_BRAM_WIDTH,C_CFG_WORD_SIZE);
-  constant C_RAM_CONFIG_BUFFER_SIZE_BITS : integer := 
+  constant C_RAM_CONFIG_BUFFER_SIZE_BITS : integer :=
     C_RAM_CONFIG_BUFFER_SIZE*C_CFG_WORD_SIZE;
 
   -- number of configuration words used for the RAM in the bram_controller.
   constant C_CFG_LUT_REGISTER_COUNT : integer
     := C_RAM_CONFIG_BUFFER_SIZE*(2**C_SEGMENT_BITS);
-  
+
   -- number of configuration words used for a single bit in the input processor
   constant C_CFG_INPUT_DECODER_REGISTERS_PER_BIT : integer :=
     cdiv(C_INPUT_WORD_SIZE,C_CFG_WORD_SIZE);
 
   -- number of registers used in the input processor
-  constant C_CFG_INPUT_DECODER_REGISTER_COUNT : integer := 
+  constant C_CFG_INPUT_DECODER_REGISTER_COUNT : integer :=
     C_CFG_INPUT_DECODER_REGISTERS_PER_BIT
     *(C_SELECTOR_BITS+C_INTERPOLATION_BITS);
-  
+
   -- number of registers used for a single row in the PLA's AND plane
   constant C_CFG_PLA_AND_REGISTERS_PER_ROW : integer :=
     cdiv(C_SELECTOR_BITS*2,C_CFG_WORD_SIZE);
@@ -70,11 +70,11 @@ package lut_package is
     C_CFG_PLA_OR_REGISTER_COUNT;
 
   -- number of registers in the daisy chain part
-  constant C_CFG_CHAIN_REGISTER_COUNT : integer := 
+  constant C_CFG_CHAIN_REGISTER_COUNT : integer :=
     C_CFG_INPUT_DECODER_REGISTER_COUNT +
     C_CFG_PLA_REGISTER_COUNT;
   -- total number of configuration registers
-  constant C_CFG_REGISTER_COUNT : integer := 
+  constant C_CFG_REGISTER_COUNT : integer :=
     C_CFG_LUT_REGISTER_COUNT+C_CFG_CHAIN_REGISTER_COUNT;
 
   type p_input_t is record
@@ -110,17 +110,17 @@ package lut_package is
     d : std_logic_vector(C_CFG_WORD_SIZE-1 downto 0);
     valid : std_logic;
   end record;
-    
+
   component single_port_ram
     generic (
       DATA_WIDTH : integer := 32;
       ADDR_WIDTH  : integer := 8
     );
     port(
-      clk : in std_logic; 
-      port1_addr   : in  std_logic_vector(0 to ADDR_WIDTH-1); 
-      port1_data_w : in  std_logic_vector(0 to DATA_WIDTH-1); 
-      port1_data_r : out std_logic_vector(0 to DATA_WIDTH-1); 
+      clk : in std_logic;
+      port1_addr   : in  std_logic_vector(0 to ADDR_WIDTH-1);
+      port1_data_w : in  std_logic_vector(0 to DATA_WIDTH-1);
+      port1_data_r : out std_logic_vector(0 to DATA_WIDTH-1);
       port1_we     : in  std_logic
     );
   end component;
@@ -136,7 +136,7 @@ package lut_package is
 
       status_o : out std_logic_vector(C_WORD_SIZE-1 downto 0);
       error_o : out std_logic;
-      
+
       cfg_mode_o : out std_logic;
       cfg_o : out cfg_word_t;
 
@@ -154,7 +154,7 @@ package lut_package is
     port (
       clk : in std_logic;
       rst : in std_logic;
-      
+
       cfg_i : in  cfg_word_t;
       cfg_o : out cfg_word_t;
 
@@ -168,7 +168,7 @@ package lut_package is
     port (
       clk : in std_logic;
       rst : in std_logic;
-      
+
       cfg_i : in  cfg_word_t;
       cfg_o : out cfg_word_t;
 
@@ -182,7 +182,7 @@ package lut_package is
     port (
       clk : in std_logic;
       rst : in std_logic;
-      
+
       cfg_i : in  cfg_word_t;
       cfg_o : out cfg_word_t;
 
@@ -201,7 +201,7 @@ package lut_package is
     port (
       clk : in std_logic;
       rst : in std_logic;
-      
+
       cfg_i : in  cfg_word_t;
       cfg_o : out cfg_word_t;
 
@@ -224,7 +224,7 @@ package lut_package is
 
       data_o : out std_logic_vector(C_WORD_SIZE-1 downto 0); -- rd
       data_valid_o : out std_logic;
-      
+
       status_o : out std_logic_vector(C_WORD_SIZE-1 downto 0);
       error_o : out std_logic
 
@@ -238,7 +238,7 @@ package body lut_package is
     variable d: natural;
   begin
     d:=x/y;
-    if (d*y)<x then 
+    if (d*y)<x then
       d := d+1;
     end if;
     return d;
@@ -246,10 +246,10 @@ package body lut_package is
 
   function max(x:integer; y:integer) return integer is
   begin
-    if x>y then 
-      return x; 
-    else 
-      return y; 
+    if x>y then
+      return x;
+    else
+      return y;
     end if;
   end function;
 
