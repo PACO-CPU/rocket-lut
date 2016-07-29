@@ -48,7 +48,7 @@ class LUTCoreControl(IDECControl,PLAControl,LUTControl,InterControl):
 
     return LUTCoreControl.intermediate_t(idec,pla,lut,inter,sim)
   
-  def config_core(s,spec,prefix=None):
+  def core_bitstream(s,spec):
     intermediate=s.core_compile(spec)
     words=(
       # RAM config phase
@@ -58,7 +58,12 @@ class LUTCoreControl(IDECControl,PLAControl,LUTControl,InterControl):
         s.idec_words(intermediate.idec.choices) +
         s.pla_words(intermediate.pla.and_plane,intermediate.pla.or_plane)
       )))
-    return words  
+    return words
+    
+
+  def config_core(s,spec):
+    words=s.core_bitstream(spec)
+
     for w in words:
       s.iface.command0(CMD_CORE_CFG,w)
     s.core_assert(raw=(s.iface.CFG_REGISTER_COUNT<<8)|0x00)

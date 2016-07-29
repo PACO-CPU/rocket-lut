@@ -1,57 +1,20 @@
 #!/usr/bin/env python3
+import os,sys
+rootpath=os.path.abspath(os.path.dirname(__file__))
+sys.path.append(os.path.join(rootpath,"../"))
 import htlib
-import sys
 import math
 import random
 import time
-import os
-
-def choices_compile(*args):
-  
-  choices=[
-    0 if i>=len(args) else 1<<args[i]
-    for i in range(iface.SELECTOR_BITS+iface.INTERPOLATION_BITS)]
-
-  def sim(x):
-    bits=[ 
-      (x>>i)&1 
-      for i in range(iface.INPUT_WORD_SIZE)]
-    r=0
-    for i,arg in enumerate(args):
-      r+=bits[arg]<<i
-    return r 
-  return choices,sim
-
-def choices_words(choices):
-  nwords=iface.CFG_INPUT_DECODER_REGISTERS_PER_BIT
-  words=sum([
-    [ (v>>(32*shamt))&((1<<iface.CFG_WORD_SIZE)-1) for shamt in range(nwords) ]
-    for v in choices
-  ],[])
-  return words
-
-
-def config_hw(*args):
-  (choices,sim)=choices_compile(*args)
-  words=choices_words(choices)
-  for w in reversed(words):
-    iface.command(htlib.CMD_CFG_WORD,w)
-
-# command-line argument handling
-randomConfigCount=1000
-randomInputCount=1000
-configTestCount=10
-port="/dev/ttyUSB0"
-baudrate=921600
 
 randomInputCount = 50
 
-iface=htlib.IFace(port,baudrate)
+iface=htlib.IFace()
 ctrl=htlib.LUTCoreControl(iface)
 
 specification=ctrl.random_core()
 intermediate=ctrl.core_compile(specification)
-raw_words = ctrl.config_core(specification)
+raw_words = ctrl.core_bitstream(specification)
 
 # generate bitstream
 os.system("rm bitstream.h")
@@ -62,7 +25,7 @@ f.write("uint64_t bitstream[BITSTREAM_SIZE] = {\n")
 
 for w in raw_words:
 
-    if int(w) > (1 << 64):
+    if int(w) >= (1 << 64):
         print("Error")
         exit(0)
     f.write("" + str(w) + ",\n")
@@ -81,7 +44,7 @@ fi.write("#define INPUT_SIZE " + str(randomInputCount) + "\n")
 fi.write("uint64_t input_vec[" + str(randomInputCount) + "] = { \n")
 fo.write("uint64_t output_vec[" + str(randomInputCount) + "] = { \n")
 
-for i in range(0, randomInputCount):
+for i in range(randomInputCount):
     x = ctrl.random_core_input()
     y = intermediate.sim(x)
     fi.write(str(x) + ",\n")

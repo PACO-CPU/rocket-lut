@@ -32,8 +32,9 @@ CMD_DIAG_OUTPUT_COUNTER = 0x41
 
 class IFace(serial.Serial):
   
-  def __init__(s,port,baud):
-    serial.Serial.__init__(s,port=port,baudrate=baud)
+  def __init__(s,port=None,baud=921600):
+    if port!=None:
+      serial.Serial.__init__(s,port=port,baudrate=baud)
     s._word_size=64
     s._selector_bits=8
     s._interpolation_bits=8
