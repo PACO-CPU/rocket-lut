@@ -33,7 +33,9 @@ class IDECControl(IFaceRef):
   def idec_words(s,choices):
     nwords=s.iface.CFG_INPUT_DECODER_REGISTERS_PER_BIT
     words=sum([
-      [ (v>>(32*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) for shamt in range(nwords) ]
+      [ 
+        (v>>(s.iface.CFG_WORD_SIZE*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) 
+        for shamt in range(nwords) ]
       for v in choices
     ],[])
     return words

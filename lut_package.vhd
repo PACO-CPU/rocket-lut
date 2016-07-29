@@ -13,7 +13,7 @@ package lut_package is
   function max(x:integer; y:integer) return integer;
   
   -- Embedding-specific constants (Rocket Chip/SoC)
-  constant C_WORD_SIZE : integer := 32;
+  constant C_WORD_SIZE : integer := 64;
   constant C_CFG_WORD_SIZE : integer := C_WORD_SIZE;
   constant C_INPUT_WORDS : integer := 3;
   

@@ -34,7 +34,7 @@ class IFace(serial.Serial):
   
   def __init__(s,port,baud):
     serial.Serial.__init__(s,port=port,baudrate=baud)
-    s._word_size=32
+    s._word_size=64
     s._selector_bits=8
     s._interpolation_bits=8
     s._segment_bits=4
@@ -52,21 +52,29 @@ class IFace(serial.Serial):
     if data==None:
       raw=struct.pack("<B",cmd)
     else:
-      raw=struct.pack("<BI",cmd,data)
+      if s._word_size==32:
+        raw=struct.pack("<BI",cmd,data)
+      else:
+        raw=struct.pack("<BQ",cmd,data)
     s.write(raw)
 
   def command0i(s,cmd,data=None):
     words=[
       (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
       for shamt in reversed(range(s.INPUT_WORDS))]
-    raw=struct.pack("<B%s"%("I"*s.INPUT_WORDS),cmd,*words)
+
+    ty="I" if s._word_size==32 else "Q"
+    raw=struct.pack("<B%s"%(ty*s.INPUT_WORDS),cmd,*words)
     s.write(raw)
 
   def command8(s,cmd,data=None):
     if data==None:
       raw=struct.pack("<B",cmd)
     else:
-      raw=struct.pack("<BI",cmd,data)
+      if s._word_size==32:
+        raw=struct.pack("<BI",cmd,data)
+      else:
+        raw=struct.pack("<BQ",cmd,data)
     s.write(raw)
     raw=s.read(1)
     return struct.unpack("<B",raw)[0]
@@ -75,10 +83,17 @@ class IFace(serial.Serial):
     if data==None:
       raw=struct.pack("<B",cmd)
     else:
-      raw=struct.pack("<BI",cmd,data)
+      if s._word_size==32:
+        raw=struct.pack("<BI",cmd,data)
+      else:
+        raw=struct.pack("<BQ",cmd,data)
     s.write(raw)
-    raw=s.read(4)
-    return struct.unpack("<I",raw)[0]
+    if s._word_size==32:
+      raw=s.read(4)
+      return struct.unpack("<I",raw[:4])[0]
+    else:
+      raw=s.read(8)
+      return struct.unpack("<Q",raw[:8])[0]
 
   def command_inter(s,cmd,selector,interpolator,base,incline):
     word=0
@@ -93,18 +108,29 @@ class IFace(serial.Serial):
     raw=bytes([cmd]+[(word>>(8*shamt))&0xff for shamt in range(byte_count)])
     
     s.write(raw)
-    raw=s.read(4)
-    return struct.unpack("<I",raw[:4])[0]
+    if s._word_size==32:
+      raw=s.read(4)
+      return struct.unpack("<I",raw[:4])[0]
+    else:
+      raw=s.read(8)
+      return struct.unpack("<Q",raw[:8])[0]
   
   def commandi(s,cmd,data):
     words=[
       (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
       for shamt in reversed(range(s.INPUT_WORDS))]
-      
-    raw=struct.pack("<B%s"%("I"*s.INPUT_WORDS),cmd,*words)
+    
+    ty="I" if s._word_size==32 else "Q"
+
+    raw=struct.pack("<B%s"%(ty*s.INPUT_WORDS),cmd,*words)
     s.write(raw)
-    raw=s.read(4)
-    return struct.unpack("<I",raw)[0]
+    if s._word_size==32:
+      raw=s.read(4)
+      return struct.unpack("<I",raw[:4])[0]
+    else:
+      raw=s.read(8)
+      return struct.unpack("<Q",raw[:8])[0]
+
 
   def load_config(s):
     s._input_words=s.command8(CMD_CFG_INPUT_WORDS)
