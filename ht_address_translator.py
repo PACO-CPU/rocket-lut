@@ -62,26 +62,26 @@ if fTestRandom: # automatically generate and test PLA configurations
   random.seed(time.time())
   with htlib.ProgressBar(0,randomPLACount) as pb_pla:
     for i_pla in range(randomPLACount):
-      code=ctrl.random_pla()
-      (and_plane,or_plane,sim)=ctrl.pla_compile(*code)
-      ctrl.config_pla(*code)
+      spec=ctrl.random_pla()
+      inter=ctrl.pla_compile(spec)
+      ctrl.config_pla(spec)
       
       with htlib.ProgressBar(0,randomInputCount,parent=pb_pla) as pb_input:
         for i_input in range(randomInputCount):
           x=ctrl.random_pla_input()
-          y_sim=sim(x)
+          y_sim=inter.sim(x)
           y_pla=iface.command(htlib.CMD_COMPUTE_PLA,x)
           if y_sim!=y_pla:
             sys.stderr.write(
               "\r\x1b[31;1mERROR\x1b[30;0m: "
               "mismatch (code: <%s>, x: %.8x, y_sim: %.8x, y_pla: %.8x)\n"
-              %(" ".join(code),x,y_sim,y_pla))
+              %(" ".join(spec.code),x,y_sim,y_pla))
           pb_input.increment(1)
 
 
 elif fHardware: # compile a PLA, download to hardware and enter shell
   print("\x1b[34;1mRunning\x1b[30;0m: hardware test (manual)")
-  ctrl.config_pla(*pla_terms)
+  ctrl.config_pla(ctrl.specification_t(pla_terms))
   try:
     while True:
       sys.stdout.write("> ")

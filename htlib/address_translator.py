@@ -2,9 +2,26 @@ from .iface import *
 import random
 from collections import namedtuple
 
+
+## Control class corresponding to ht_address_translator.
+#
+# Offers facilities to generate random PLA configurations and inputs as well as
+# a simulation method and configuration of hardware instantiation.
 class PLAControl(IFaceRef):
+  
+  ## Type encapsulating a raw address translator (PLA) specification
+  specification_t=namedtuple("pla_specification_t","code")
+  
+  ## Encapsulates an intermediate representation of a PLA.
+  #
+  # Contains information required to configure a hardware instantiation as
+  # well as a method for simulating that PLA.
   intermediate_t=namedtuple("pla_intermediate_t","and_plane or_plane sim")
   
+  ## generates a random PLA specification.
+  #
+  # The result is a specificiation accepted by pla_compile, pla_words and 
+  # config_pla.
   def random_pla(s):
     code=[
       (
@@ -16,8 +33,12 @@ class PLAControl(IFaceRef):
       for choices in [
         [random.randint(0,3) for i in range(s.iface.SELECTOR_BITS)]
         for i_bit in range(s.iface.SEGMENT_BITS)]]
-    return code
-
+    return PLAControl.specification_t(code)
+  
+  # Generates a random input for a PLA.
+  #
+  # This can be used as input to a hardware instantiation or a simulation
+  # method as returned by pla_compile.
   def random_pla_input(s):
     return random.randint(0,(1<<s.iface.SELECTOR_BITS)-1)
 
@@ -44,13 +65,13 @@ class PLAControl(IFaceRef):
   #
   # Returns the and plane rows, or plane columns and a simulation function of
   # signature integer -> integer.
-  def pla_compile(s,*args):
-    if len(args)>s.iface.SEGMENT_BITS:
+  def pla_compile(s,spec):
+    if len(spec.code)>s.iface.SEGMENT_BITS:
       raise htlib.TestFailure("cannot represent PLA: too many output bits")
 
     arg_products=[
       [s.parse_product(v) for v in arg.split(",")]
-      for arg in args]
+      for arg in spec.code]
     
     products={ p for p in sum(arg_products,[]) }
     
@@ -85,35 +106,36 @@ class PLAControl(IFaceRef):
       return or_eval
 
 
-    return and_plane,or_plane,sim
+    return PLAControl.intermediate_t(and_plane,or_plane,sim)
 
   ## Translates an and and or plane as computed by pla_compile into a stream of
   # registers to be applied to a hardware core
   #
   # Note that in order to apply the configuration correctly, the words must be
   # transmitted in reversed order.
-  def pla_words(s,and_plane,or_plane):
+  # @input inter intermediate representation of type intermediate_t.
+  def pla_words(s,inter):
     and_words=math.ceil(s.iface.SELECTOR_BITS*2/s.iface.CFG_WORD_SIZE)
     or_words=math.ceil(s.iface.PLA_INTERCONNECTS/s.iface.CFG_WORD_SIZE)
     and_plane=sum([
       [ 
         (v>>(s.iface.CFG_WORD_SIZE*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) 
         for shamt in range(and_words) ]
-      for v in and_plane
+      for v in inter.and_plane
     ],[])
     or_plane=sum([
       [ 
         (v>>(s.iface.CFG_WORD_SIZE*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) 
         for shamt in range(and_words) ]
-      for v in or_plane
+      for v in inter.or_plane
     ],[])
 
     return and_plane+or_plane
 
   ## Compiles and downloads a PLA onto the connected hardware.
-  def config_pla(s,*args):
-    (and_plane,or_plane,sim)=s.pla_compile(*args)
-    words=s.pla_words(and_plane,or_plane)
+  def config_pla(s,spec):
+    inter=s.pla_compile(spec)
+    words=s.pla_words(inter)
     for w in reversed(words):
       s.iface.command(CMD_CFG_WORD,w)
 

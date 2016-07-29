@@ -51,11 +51,11 @@ print(
   "\x1b[34;1mRunning\x1b[30;0m: automatic test (%i points)"
   %(randomInputCount))
 random.seed(time.time())
-sim=ctrl.inter_compile()
+inter=sim=ctrl.inter_compile()
 with htlib.ProgressBar(0,randomInputCount) as pb_input:
   for i in range(randomInputCount):
     (selector,interpolator,base,incline)=ctrl.random_inter_input()
-    y_sim=sim(selector,interpolator,base,incline)
+    y_sim=inter.sim(selector,interpolator,base,incline)
     y_inter=iface.command_inter(
       htlib.CMD_COMPUTE_INTER,selector,interpolator,base,incline)
 

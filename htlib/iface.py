@@ -30,6 +30,14 @@ CMD_CORE_EXE_BEGIN = 0x34
 CMD_DIAG_CLOCK_COUNTER = 0x40
 CMD_DIAG_OUTPUT_COUNTER = 0x41
 
+## Common interface for hardware tests.
+#
+# Connects to a hardware test instantiation via UART connection and maintains
+# a set of architecture-specific constants by querying them from the
+# hardware test.
+# Also offers methods for interfacing common command-and-response patterns
+# with the hardware test.
+
 class IFace(serial.Serial):
   
   def __init__(s,port=None,baud=921600):
@@ -48,7 +56,11 @@ class IFace(serial.Serial):
     s._input_decoder_delay=1
     s._address_translator_delay=1
     s._interpolator_delay=4
-
+  
+  ## Executes a command with no response and zero or one words of details.
+  #
+  # @param cmd command (`CMD_*`) constant to execute, must be between 0 and 255.
+  # @param data Optional word of data (must be between 0 and 2^WORD_SIZE-1).
   def command0(s,cmd,data=None):
     if data==None:
       raw=struct.pack("<B",cmd)
@@ -58,7 +70,12 @@ class IFace(serial.Serial):
       else:
         raw=struct.pack("<BQ",cmd,data)
     s.write(raw)
-
+  
+  ## Executes a command with no response and a single data value represented as
+  # a pipeline input.
+  #
+  # @param cmd command (`CMD_*`) constant to execute, must be between 0 and 255.
+  # @param data Data value to be encoded as a tuple of INPUT_WORDS words.
   def command0i(s,cmd,data=None):
     words=[
       (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
@@ -67,6 +84,13 @@ class IFace(serial.Serial):
     ty="I" if s._word_size==32 else "Q"
     raw=struct.pack("<B%s"%(ty*s.INPUT_WORDS),cmd,*words)
     s.write(raw)
+  
+  ## Executes a command with a single byte response and zero or one words of
+  # data.
+  #
+  # @param cmd command (`CMD_*`) constant to execute, must be between 0 and 255.
+  # @param data Optional word of data (must be between 0 and 2^WORD_SIZE-1).
+  # @return A single byte, as integer
 
   def command8(s,cmd,data=None):
     if data==None:
@@ -80,6 +104,12 @@ class IFace(serial.Serial):
     raw=s.read(1)
     return struct.unpack("<B",raw)[0]
     
+  ## Executes a command with a single word response and zero or one words of
+  # data.
+  #
+  # @param cmd command (`CMD_*`) constant to execute, must be between 0 and 255.
+  # @param data Optional word of data (must be between 0 and 2^WORD_SIZE-1).
+  # @return A single word, as integer
   def command(s,cmd,data=None):
     if data==None:
       raw=struct.pack("<B",cmd)
@@ -96,6 +126,19 @@ class IFace(serial.Serial):
       raw=s.read(8)
       return struct.unpack("<Q",raw[:8])[0]
 
+  ## Executes a command with a single word response and a 4-tuple of data
+  # represented as input to the interpolation unit.
+  #
+  # The 4-tuple is represented by first creating a bit-vector concatenation of
+  # the four data inputs (selector, interpolator, base, incline) and then 
+  # sending it with as many words as needed to cover all bits.
+  #
+  # @param cmd command (`CMD_*`) constant to execute, must be between 0 and 255.
+  # @param selector First part of the 4-tuple of data.
+  # @param interpolator Second part of the 4-tuple of data.
+  # @param base Third part of the 4-tuple of data.
+  # @param incline Fourth part of the 4-tuple of data.
+  # @return A single word, as integer
   def command_inter(s,cmd,selector,interpolator,base,incline):
     word=0
     word=(word<<s.SELECTOR_BITS) | selector
@@ -116,6 +159,12 @@ class IFace(serial.Serial):
       raw=s.read(8)
       return struct.unpack("<Q",raw[:8])[0]
   
+  ## Executes a command with a single word response and a single data value 
+  # represented as a pipeline input.
+  #
+  # @param cmd command (`CMD_*`) constant to execute, must be between 0 and 255.
+  # @param data Data value to be encoded as a tuple of INPUT_WORDS words.
+  # @return A single word, as integer
   def commandi(s,cmd,data):
     words=[
       (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
@@ -132,7 +181,11 @@ class IFace(serial.Serial):
       raw=s.read(8)
       return struct.unpack("<Q",raw[:8])[0]
 
-
+  ## Queries architecture-specific parameters from the connected hardware test
+  # core.
+  #
+  # This updates the values for all properties except for WORD_SIZE and 
+  # CFG_WORD_SIZE, which are hard-coded.
   def load_config(s):
     s._input_words=s.command8(CMD_CFG_INPUT_WORDS)
     s._selector_bits=s.command8(CMD_CFG_SELECTOR_BITS)
@@ -146,7 +199,9 @@ class IFace(serial.Serial):
     s._input_decoder_delay=s.command8(CMD_CFG_INPUT_DECODER_DELAY)
     s._address_translator_delay=s.command8(CMD_CFG_ADDRESS_TRANSLATOR_DELAY)
     s._interpolator_delay=s.command8(CMD_CFG_INTERPOLATOR_DELAY)
-
+  
+  ## Performs a test case common to all hardware tests, ensuring that the
+  # test state machine itself is reachable and operational.
   def test_echo(s):
     for i in range(100):
       x=random.randint(0,0xffffffff)
@@ -154,7 +209,9 @@ class IFace(serial.Serial):
       if x!=y: 
         print(
           "echo did not respond properly: expected %.8x, got %.8x"%(x,y))
-
+  
+  ## Tests a configuration daisy-chain by filling it, emptying it and checking
+  # the returned words.
   def test_config(s,count):
     for i in range(count):
       s.command(CMD_CFG_WORD,i+1024)
@@ -166,6 +223,7 @@ class IFace(serial.Serial):
           "expected %.8x, got %.8x"
           %(i+1024,old))
   
+  ## Outputs details of the previously queried configuration data on stdout.
   def print_config(s):
     print("  word size: .............. %s"%s.WORD_SIZE)
     print("  input words: ............ %s"%s.INPUT_WORDS)
