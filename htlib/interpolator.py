@@ -1,6 +1,7 @@
 from .iface import *
 import random
 from collections import namedtuple
+import sys
 
 class InterControl(IFaceRef):
   intermediate_t=namedtuple("inter_intermediate_t","sim")
@@ -19,12 +20,17 @@ class InterControl(IFaceRef):
     if incline&(1<<(s.iface.INCLINE_BITS-1)):
       incline=incline-(1<<s.iface.INCLINE_BITS)
     return incline
+  def base_sex(s,base):
+    if base&(1<<(s.iface.BASE_BITS-1)):
+      base=base-(1<<s.iface.BASE_BITS)
+    return base
 
   def inter_compile(s):
     def sim(selector,interpolator,base,incline):
       incline=s.incline_sex(incline)
+      base=s.base_sex(base)
       mult=(selector<<s.iface.INTERPOLATION_BITS) | interpolator
-      return (base+mult*incline)&0xffffffff
+      return (base+mult*incline)&((1<<s.iface.WORD_SIZE)-1)
     
     return sim
 

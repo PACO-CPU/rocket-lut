@@ -96,11 +96,15 @@ class PLAControl(IFaceRef):
     and_words=math.ceil(s.iface.SELECTOR_BITS*2/s.iface.CFG_WORD_SIZE)
     or_words=math.ceil(s.iface.PLA_INTERCONNECTS/s.iface.CFG_WORD_SIZE)
     and_plane=sum([
-      [ (v>>(32*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) for shamt in range(and_words) ]
+      [ 
+        (v>>(s.iface.CFG_WORD_SIZE*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) 
+        for shamt in range(and_words) ]
       for v in and_plane
     ],[])
     or_plane=sum([
-      [ (v>>(32*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) for shamt in range(and_words) ]
+      [ 
+        (v>>(s.iface.CFG_WORD_SIZE*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) 
+        for shamt in range(and_words) ]
       for v in or_plane
     ],[])
 

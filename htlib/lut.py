@@ -34,7 +34,9 @@ class LUTControl(IFaceRef):
   def lut_words(s,choices):
     nwords=s.iface.RAM_CONFIG_BUFFER_SIZE
     words=sum([
-      [ (v>>(32*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) for shamt in range(nwords) ]
+      [ 
+        (v>>(s.iface.CFG_WORD_SIZE*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) 
+        for shamt in range(nwords) ]
       for v in choices
     ],[])
     return words

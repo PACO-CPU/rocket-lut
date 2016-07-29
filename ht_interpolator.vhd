@@ -22,11 +22,11 @@ architecture implementation of ht_interpolator is
   constant C_INTER_BITS : integer := 
     C_SELECTOR_BITS+C_INTERPOLATION_BITS+C_BASE_BITS+C_INCLINE_BITS;
   constant C_INTER_WORDS : integer :=
-    cdiv(C_INTER_BITS,32);
+    cdiv(C_INTER_BITS,C_WORD_SIZE);
   
   signal clk : std_logic;
  
-  signal word : std_logic_vector(31 downto 0);
+  signal word : std_logic_vector(C_WORD_SIZE-1 downto 0);
   signal word_counter : integer;
 
   signal rx_valid : std_logic;
@@ -48,7 +48,7 @@ architecture implementation of ht_interpolator is
   signal i_signals: inter_i_signals_t;
   signal o_signals: inter_o_signals_t;
 
-  signal input: std_logic_vector(C_INTER_WORDS*32-1 downto 0);
+  signal input: std_logic_vector(C_INTER_WORDS*C_WORD_SIZE-1 downto 0);
   signal input_counter : integer;
 
 begin
@@ -144,7 +144,7 @@ begin
         when RX_WORD =>
           if rx_valid='1' then
             word(word_counter*8+7 downto word_counter*8) <= rx_data;
-            if word_counter=3 then
+            if word_counter=(C_WORD_SIZE/8)-1 then
               state <= state_post_rx;
               word_counter <= 0;
             else
@@ -156,7 +156,7 @@ begin
           tx_valid <= '1';
           tx_data <= word(word_counter*8+7 downto word_counter*8);
           if (tx_valid='1') and (tx_ready='1') then
-            if word_counter=3 then
+            if word_counter=(C_WORD_SIZE/8)-1 then
               tx_valid <= '0';
               word_counter <= 0;
               state <= state_post_tx;

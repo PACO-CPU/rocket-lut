@@ -21,7 +21,7 @@ end entity;
 architecture implementation of ht_address_translator is
   signal clk : std_logic;
 
-  signal word : std_logic_vector(31 downto 0);
+  signal word : std_logic_vector(C_WORD_SIZE-1 downto 0);
   signal word_counter : integer;
 
   signal rx_valid : std_logic;
@@ -133,7 +133,7 @@ begin
         when RX_WORD =>
           if rx_valid='1' then
             word(word_counter*8+7 downto word_counter*8) <= rx_data;
-            if word_counter=3 then
+            if word_counter=(C_WORD_SIZE/4)-1 then
               state <= state_post_rx;
               word_counter <= 0;
             else
@@ -145,7 +145,7 @@ begin
           tx_valid <= '1';
           tx_data <= word(word_counter*8+7 downto word_counter*8);
           if (tx_valid='1') and (tx_ready='1') then
-            if word_counter=3 then
+            if word_counter=(C_WORD_SIZE/4)-1 then
               tx_valid <= '0';
               word_counter <= 0;
               state <= state_post_tx;
