@@ -1,8 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library work;
-use work.lut_package.all;
+library paco_lut;
+use paco_lut.lut_package.all;
 
 entity tb_ is
 end entity;
@@ -14,6 +14,10 @@ architecture behavior of tb_ is
 
   type i_signals_t is record
     id_rst_i : std_logic;
+  end record;
+
+  type o_signals_t is record
+
   end record;
 
   signal i_signals: i_signals_t;

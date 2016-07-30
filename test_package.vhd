@@ -5,8 +5,8 @@ use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 use ieee.std_logic_misc.all;
 
-library work;
-use work.lut_package.all;
+library paco_lut;
+use paco_lut.lut_package.all;
 
 package test_package is
   constant C_CLK_FREQ : integer := 100000000;

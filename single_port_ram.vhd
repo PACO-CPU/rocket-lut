@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_signed.all;
 use ieee.std_logic_arith.all;
 
-library work;
+library paco_lut;
 
 --! @brief Standard instantiation of a single-port block RAM memory.
 entity single_port_ram is

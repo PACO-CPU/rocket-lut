@@ -1,3 +1,5 @@
-/bitstream.h
-/input_vec.h
-/output_vec.h
+/test_data.c
+/bootimage
+/bootimage.hex
+*.o
+/main.s

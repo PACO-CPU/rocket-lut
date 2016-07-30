@@ -1,8 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library work;
-use work.lut_package.all;
+library paco_lut;
+use paco_lut.lut_package.all;
 
 --! @brief RAM i/o controller pipeline stage for the LUT HW core.
 --! @details Performs a RAM lookup using the pipeline_i.address bitvector
