@@ -3,6 +3,12 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
+--! @brief UART transmitter component
+--! @details Implements a UART receiver for configurable baud rate and 8N1
+--! communication.
+--! A single frame of data is accepted on input di while ready is high.
+--! To indicate a frame of data should be transmitted, set valid high and wait
+--! for valid and ready to be high at the same time.
 entity uart_transmitter is
 	generic(
 		CLK_FREQ  : integer := 50000000;

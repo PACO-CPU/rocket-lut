@@ -2,9 +2,19 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-library work;
-use work.lut_package.all;
+library paco_lut;
+use paco_lut.lut_package.all;
 
+--! @brief The final stage of the LUT HW core pipeline, performing a
+--! multiply-and-add operation.
+--! @details Performs the operation base + incline * (selector ~ interpolator),
+--! adding base to the product of incline and the concatenation of the
+--! selector bits and the interpolator bits. 
+--! base and incline are interpreted as two's complement and the
+--! selector/interpolator concatenation is unsigned.
+--!
+--! The MAD operation is done in combinational logic with a configurable
+--! number (C_INTERPOLATOR_DELAY) of succeeding delay steps.
 entity interpolator is
   port (
     clk : in std_logic;
@@ -46,7 +56,10 @@ begin
   -- sign-aware extraction of the result's LSB
   p_result.valid <= pipeline_i.valid;
   p_result.data <= result_bv_ext(C_WORD_SIZE-1 downto 0);
-  
+ 
+  -- delay pipeline: result -> delay(0) -> ... -> pipeline_o
+  -- since p_result and pipeline_o are combinational, even a setting of 
+  -- C_INTERPOLATOR_DELAY=0 should work.
   p_delay(0) <= p_result;
   process (clk) is
     variable i: integer;

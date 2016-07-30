@@ -3,6 +3,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
+--! @brief Simple tick generator for use in UART transceivers.
+--! @details This component takes a clock and reset signal and outputs a
+--! tick signal which is set to high for one clock cycle periodically.
+--! The period is defined via the generics CLK_FREQ and BAUD_RATE: A tick is
+--! generated every floor(CLK_FREQ/BAUD_RATE) clock cycles.
+--! The tick rises with clk and falls with the next rise of clk. It is kept
+--! low asynchronously while rst is set high.
 entity baud_rate_generator is
 	generic(
 		CLK_FREQ  : integer := 50000000;

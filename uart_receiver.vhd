@@ -3,6 +3,11 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
+--! @brief UART receiver component
+--! @details Implements a UART receiver for configurable baud rate and 8N1 
+--! communication.
+--! A receiving frame is visible on output do in the clock cycle in which
+--! valid is high.
 entity uart_receiver is
 	generic(
 		CLK_FREQ  : integer := 50000000;

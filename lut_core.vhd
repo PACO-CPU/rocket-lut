@@ -1,12 +1,13 @@
 
---! @brief Top-level description of the LUT Hardware core
-
 library ieee;
 use ieee.std_logic_1164.all;
 
 library work;
 use work.lut_package.all;
 
+--! @brief Top-level module for the LUT HW core
+--! @details This module connects directly to the processor pipeline or
+--! appropriate test benches / hardware tests.
 entity lut_core is
   port (
     clk : in std_logic;

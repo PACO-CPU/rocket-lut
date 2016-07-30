@@ -6,6 +6,27 @@ use ieee.std_logic_unsigned.all;
 library work;
 use work.lut_package.all;
 
+--! @brief Control logic and configuration state machine for the LUT HW core
+--! @brief Implements a state machine for accepting a single instruction per
+--! clock cycle (reset, status, execute, config).
+--! The instruction to be executed is selected as a one-hot encoding in inputs
+--! id_rst_i, id_stat_i, id_exe_i and id_cfg_i, respectively. When multiple
+--! inputs are high at the same time, the first one is used: Reset always
+--! takes precedence over any other instruction. If id_rst_i is low, 
+--! the status instruction has the highest oder of precedence. The other two
+--! instructions are mutually exclusive.
+--! In reset state, configuration data is expected to be fed via the config
+--! instruction (C_CFG_REGISTER_COUNT words). After configuration was completed,
+--! execute instructions may be requested. If an execute instruction occurs
+--! prematurely or a configuration instruction occurs after all data was 
+--! already received, an error state is assumed.
+--! The status instruction returns the error state as well as the number of
+--! configuration registers written.
+--! The lut_controller core is tied into the rest of the LUT HW core by
+--! connecting the pipeline_o and cfg_o outputs to the first pipeline stage
+--! and the lut_* outputs to the RAM interface of the lookup stage. The
+--! remainder of signals is connected directly to the LUT HW core external
+--! ports.
 entity lut_controller is
   port (
     clk : in std_logic;

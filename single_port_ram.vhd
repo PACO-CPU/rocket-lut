@@ -5,6 +5,7 @@ use ieee.std_logic_arith.all;
 
 library work;
 
+--! @brief Standard instantiation of a single-port block RAM memory.
 entity single_port_ram is
   generic (
     DATA_WIDTH : integer := 32;

@@ -4,6 +4,22 @@ use ieee.std_logic_1164.all;
 library work;
 use work.lut_package.all;
 
+--! @brief Input bit selector pipeline stage for the LUT HW core
+--! @details The first pipeline stage inputs an input bitvector comprised of
+--! a number of input words coming from the processor pipeline. In this stage
+--! the selector and interpolator bitvectors are selected from that input 
+--! vector by means of an OR plane.
+--! For each bit of the selector and interpolator, the input bitvector is
+--! AND-combined with a configurable vector. The resulting bitvectors are then
+--! OR-reduced to form the individual bits of the selector and interpolator.
+--! In this core, the LSB of the interpolator is the first selected bit,
+--! followed by the more significant bits of the interpolator and then the
+--! LSB of the selector, followed by the more significant bits of the selector.
+--! The configuration logic chains together the bitvectors of each bit in 
+--! that order. To allow for all bits to be arranged in a shift register, the
+--! bit vector widths are all a multiple of the configuration word size.
+--! In each bitvector, the most significant word is always the first one in
+--! the chain.
 entity input_processor is
   port (
     clk : in std_logic;
@@ -44,14 +60,18 @@ begin
     p_result.valid <= pipeline_i.valid;
     
     for i in 0 to C_SELECTOR_BITS+C_INTERPOLATION_BITS-1 loop
+      -- AND combine the input with a column of crosspoints
       or_line := crosspoints(i) and pipeline_i.data;
+
+      -- OR-combine the result to form a bit of the resulting 
+      -- selector/interpolator
       if or_line=OR_ZERO then
         result_word(i) := '0';
       else
         result_word(i) := '1';
       end if;
     end loop;
-    
+    -- distribute the bits among the pipeline outputs
     p_result.selector <= result_word(
       C_SELECTOR_BITS+C_INTERPOLATION_BITS-1 downto C_INTERPOLATION_BITS);
     p_result.interpolator <= result_word(C_INTERPOLATION_BITS-1 downto 0);
