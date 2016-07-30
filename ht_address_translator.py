@@ -1,3 +1,22 @@
+## @package ht_address_tranlator
+# Hardware test script for the address translator unit (PLA)
+#
+# This is a command-line tool used for interfacing with an instantiation of the
+# PLA hardware test implemented on an FPGA connected via UART.
+# Three test commands exist: Software, hardware and automatic.
+# Software/Hardware tests accept a number of terms as command-line argument 
+# which are translated into PLA configuration. The user is then offered a 
+# prompt in which inputs are entered as bit vectors. These inputs are then
+# fed into the simulator (Software) or the instantiation (Hardware) and the
+# respective result is printed out. These tests are used to manually verify
+# the correctness of a PLA implementation.
+# The automatic test assumes the correct implementation of the PLA simulation
+# (which must be verified using the Software test) and uses it to test random
+# PLAs on the hardware by comparing random inputs-output pairs to the simulated
+# results.
+#
+# For further information on command-line flags look at the command-line
+# argument handling state machine.
 #!/usr/bin/env python3
 import htlib
 import sys

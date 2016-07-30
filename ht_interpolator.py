@@ -1,3 +1,15 @@
+## @package ht_interpolator
+# Hardware test script for the interpolator.
+#
+# This is a command-line tool used for interfacing with an instantiation of the
+# interpolator hardware test implemented on an FPGA connected via UART.
+# The automatic test assumes the correct implementation of the software 
+# simulation which was verified manually. This simulation is used to expose 
+# the hardware core to random inputs and comparing its output with simulated
+# ones.
+#
+# For further information on command-line flags look at the command-line
+# argument handling state machine.
 #!/usr/bin/env python3
 import htlib
 import sys

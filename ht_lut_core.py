@@ -1,3 +1,16 @@
+## @package ht_lut_core
+# Hardware test script for the lut core component test
+#
+# This is a command-line tool used for interfacing with an instantiation of the
+# lut core hardware test implemented on an FPGA connected via UART.
+# The automatic test assumes the correct implementation of the software 
+# simulation of all pipeline stages which were verified manually. This 
+# simulation is used to expose the hardware core to random inputs and comparing 
+# its output with simulated ones.
+#
+# For further information on command-line flags look at the command-line
+# argument handling state machine.
+
 #!/usr/bin/env python3
 import htlib
 import sys
