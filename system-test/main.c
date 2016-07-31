@@ -2,7 +2,7 @@
 #include <inttypes.h>
 
 #include "test_data.c"
-#define SILENT 1 
+#define SILENT 0 
 
 void fmt_u64(char *p, uint64_t v);
 uint64_t lut_status();
@@ -53,6 +53,7 @@ void run_test() {
       "ERROR: xxxxxxxxxxxxxxxx (phys) != xxxxxxxxxxxxxxxx (exp) @ xxxxxxxxxxxxxxxx";
     int i;
     uint64_t phys_result;
+    char term[3]={0,0,'\n'};
     #if !SILENT
     uart_println("beginning test..");
     lut_status();
@@ -79,11 +80,14 @@ void run_test() {
             #else
             asm("li x31, 0xdead");
             #endif
+            term[1]=1;
         }
 
     }
 
     lut_status();
+
+    uart_write(term,sizeof(term));
 
 }
 #endif

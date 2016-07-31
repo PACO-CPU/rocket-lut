@@ -4,15 +4,15 @@ rootpath=os.path.abspath(os.path.dirname(__file__))
 sys.path.append(os.path.join(rootpath,"../"))
 import htlib
 import random
+import time
 
 randomInputCount = 50
-
-random.seed(12)
+random.seed(time.time())
 
 iface=htlib.IFace()
 ctrl=htlib.LUTCoreControl(iface)
 
-specification=ctrl.random_core()
+specification=ctrl.random_core(singleInput=True)
 intermediate=ctrl.core_compile(specification)
 raw_words = ctrl.core_bitstream(specification)
 

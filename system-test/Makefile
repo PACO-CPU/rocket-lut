@@ -26,7 +26,7 @@ install: bootimage.hex
 	cp bootimage.hex $(RISCV)/../rocket-soc/rocket_soc/fw_images/
 
 run: main.bin
-	riscv-uart-flash -i main.bin -p $(UART)
+	riscv-uart-flash -i -w main.bin -p $(UART)
 
 boot: bootimage.hex
 
