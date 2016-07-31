@@ -3,8 +3,8 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 
-library paco_lut;
-use paco_lut.lut_package.all;
+library work;
+use work.lut_package.all;
 
 --! @brief Control logic and configuration state machine for the LUT HW core
 --! @brief Implements a state machine for accepting a single instruction per

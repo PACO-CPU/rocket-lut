@@ -2,7 +2,7 @@
 #include <inttypes.h>
 
 #include "test_data.c"
-#define SILENT 1
+#define SILENT 1 
 
 void fmt_u64(char *p, uint64_t v);
 uint64_t lut_status();
@@ -24,9 +24,9 @@ void fmt_u64(char *p, uint64_t v) {
 uint64_t lut_status() {
     static char s_status[]="status: xxxxxxxxxxxxxxxx";
     uint64_t s=0xaffedead;
-    //asm("luts %0, 0" : "=r"(s));
-    fmt_u64(s_status+8,s);
+    asm("luts %0, 0" : "=r"(s));
     #if !SILENT
+    fmt_u64(s_status+8,s);
     uart_println(s_status);
     #endif
     return s;
@@ -63,6 +63,7 @@ void run_test() {
     #else
     lut_reset();
     lut_load_config();
+    lut_status();
     #endif
 
     for (i = 0; i < INPUT_SIZE; i++) {

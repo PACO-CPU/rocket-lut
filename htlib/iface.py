@@ -2,6 +2,8 @@ import serial
 import struct
 import random
 import math
+import os
+import re
 from .error import TestFailure
 
 CMD_ECHO = 0x01
@@ -56,6 +58,8 @@ class IFace(serial.Serial):
     s._input_decoder_delay=1
     s._address_translator_delay=1
     s._interpolator_delay=4
+
+    s.load_config_file()
   
   ## Executes a command with no response and zero or one words of details.
   #
@@ -199,6 +203,38 @@ class IFace(serial.Serial):
     s._input_decoder_delay=s.command8(CMD_CFG_INPUT_DECODER_DELAY)
     s._address_translator_delay=s.command8(CMD_CFG_ADDRESS_TRANSLATOR_DELAY)
     s._interpolator_delay=s.command8(CMD_CFG_INTERPOLATOR_DELAY)
+  
+  ## Loads architecture-specific parameters by reading the lut_package file.
+  def load_config_file(s):
+    e=re.compile(
+      r"\s*constant\s*C_([A-Z_0-9]+)\s*:\s*integer\s*:=\s*([0-9]+?)\s*;$")
+
+    fn=os.path.join(
+      os.path.abspath(os.path.dirname(__file__)),
+      "../lut_package.vhd")
+
+
+    fields={
+      "SELECTOR_BITS",
+      "INPUT_WORDS",
+      "INTERPOLATION_BITS",
+      "SEGMENT_BITS",
+      "PLA_INTERCONNECTS",
+      "BASE_BITS",
+      "INCLINE_BITS",
+      "INPUT_DECODER_DELAY",
+      "ADDRESS_TRANSLATOR_DELAY",
+      "INTERPOLATOR_DELAY",
+      "CONTROLLER_DELAY"
+    }
+
+    with open(fn,"r") as f:
+      for ln in f:
+        m=e.match(ln.strip())
+        if not m: continue
+        (ids,val)=m.groups()
+        if ids in fields:
+          setattr(s,"_%s"%ids.lower(),int(val))
   
   ## Performs a test case common to all hardware tests, ensuring that the
   # test state machine itself is reachable and operational.

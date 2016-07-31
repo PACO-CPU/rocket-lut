@@ -22,12 +22,173 @@
   <sourceproject xmlns="http://www.xilinx.com/XMLSchema" xil_pn:fileType="FILE_XISE" xil_pn:name="rocket-lut.xise"/>
 
   <files xmlns="http://www.xilinx.com/XMLSchema">
+    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="_ngo"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/bitgen.xmsgs"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/map.xmsgs"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/ngdbuild.xmsgs"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/par.xmsgs"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/trce.xmsgs"/>
+    <file xil_pn:fileType="FILE_XMSGS" xil_pn:name="_xmsgs/xst.xmsgs"/>
     <file xil_pn:fileType="FILE_NCD" xil_pn:name="ht_address_translator_guide.ncd" xil_pn:origination="imported"/>
     <file xil_pn:fileType="FILE_NCD" xil_pn:name="ht_input_decoder_guide.ncd" xil_pn:origination="imported"/>
     <file xil_pn:fileType="FILE_NCD" xil_pn:name="ht_interpolator_guide.ncd" xil_pn:origination="imported"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_REPORT" xil_pn:name="ht_lut_core.bgn" xil_pn:subbranch="FPGAConfiguration"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BIT" xil_pn:name="ht_lut_core.bit" xil_pn:subbranch="FPGAConfiguration"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGDBUILD_LOG" xil_pn:name="ht_lut_core.bld"/>
+    <file xil_pn:fileType="FILE_CMD_LOG" xil_pn:name="ht_lut_core.cmd_log"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_DRC" xil_pn:name="ht_lut_core.drc" xil_pn:subbranch="FPGAConfiguration"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_LSO" xil_pn:name="ht_lut_core.lso"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NCD" xil_pn:name="ht_lut_core.ncd" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGC" xil_pn:name="ht_lut_core.ngc"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGD" xil_pn:name="ht_lut_core.ngd"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGR" xil_pn:name="ht_lut_core.ngr"/>
+    <file xil_pn:fileType="FILE_PAD_MISC" xil_pn:name="ht_lut_core.pad"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAR_REPORT" xil_pn:name="ht_lut_core.par" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PCF" xil_pn:name="ht_lut_core.pcf" xil_pn:subbranch="Map"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_PROJECT" xil_pn:name="ht_lut_core.prj"/>
+    <file xil_pn:fileType="FILE_TRCE_MISC" xil_pn:name="ht_lut_core.ptwx"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_STX" xil_pn:name="ht_lut_core.stx"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST_REPORT" xil_pn:name="ht_lut_core.syr"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_TIMING_TXT_REPORT" xil_pn:name="ht_lut_core.twr" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_TIMING_XML_REPORT" xil_pn:name="ht_lut_core.twx" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_UNROUTES" xil_pn:name="ht_lut_core.unroutes" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_BITGEN_REPORT" xil_pn:name="ht_lut_core.ut" xil_pn:subbranch="FPGAConfiguration"/>
+    <file xil_pn:fileType="FILE_XPI" xil_pn:name="ht_lut_core.xpi"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_XST" xil_pn:name="ht_lut_core.xst"/>
+    <file xil_pn:fileType="FILE_HTML" xil_pn:name="ht_lut_core_envsettings.html"/>
     <file xil_pn:fileType="FILE_NCD" xil_pn:name="ht_lut_core_guide.ncd" xil_pn:origination="imported"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_MAP_REPORT" xil_pn:name="ht_lut_core_map.map" xil_pn:subbranch="Map"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_MAP_REPORT" xil_pn:name="ht_lut_core_map.mrp" xil_pn:subbranch="Map"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NCD" xil_pn:name="ht_lut_core_map.ncd" xil_pn:subbranch="Map"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_NGM" xil_pn:name="ht_lut_core_map.ngm" xil_pn:subbranch="Map"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="ht_lut_core_map.xrpt"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="ht_lut_core_ngdbuild.xrpt"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAD_EXCEL_REPORT" xil_pn:name="ht_lut_core_pad.csv" xil_pn:subbranch="Par"/>
+    <file xil_pn:branch="Implementation" xil_pn:fileType="FILE_PAD_TXT_REPORT" xil_pn:name="ht_lut_core_pad.txt" xil_pn:subbranch="Par"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="ht_lut_core_par.xrpt"/>
+    <file xil_pn:fileType="FILE_HTML" xil_pn:name="ht_lut_core_summary.html"/>
+    <file xil_pn:fileType="FILE_FITTER_REPORT" xil_pn:name="ht_lut_core_summary.xml"/>
+    <file xil_pn:fileType="FILE_WEBTALK" xil_pn:name="ht_lut_core_usage.xml"/>
+    <file xil_pn:fileType="FILE_XRPT" xil_pn:name="ht_lut_core_xst.xrpt"/>
+    <file xil_pn:fileType="FILE_HTML" xil_pn:name="usage_statistics_webtalk.html"/>
+    <file xil_pn:fileType="FILE_LOG" xil_pn:name="webtalk.log"/>
+    <file xil_pn:fileType="FILE_FITTER_REPORT" xil_pn:name="webtalk_pn.xml"/>
+    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="xlnx_auto_0_xdb"/>
+    <file xil_pn:fileType="FILE_DIRECTORY" xil_pn:name="xst"/>
   </files>
 
-  <transforms xmlns="http://www.xilinx.com/XMLSchema"/>
+  <transforms xmlns="http://www.xilinx.com/XMLSchema">
+    <transform xil_pn:end_ts="1469839184" xil_pn:name="TRAN_copyInitialToXSTAbstractSynthesis" xil_pn:start_ts="1469839184">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1469839184" xil_pn:name="TRAN_schematicsToHdl" xil_pn:prop_ck="6338908098699356148" xil_pn:start_ts="1469839184">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1469839184" xil_pn:name="TRAN_regenerateCores" xil_pn:prop_ck="2720943628450857505" xil_pn:start_ts="1469839184">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1469839184" xil_pn:name="TRAN_SubProjectAbstractToPreProxy" xil_pn:start_ts="1469839184">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1469839184" xil_pn:name="TRAN_xawsTohdl" xil_pn:prop_ck="-2795212765884653660" xil_pn:start_ts="1469839184">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1469839184" xil_pn:name="TRAN_SubProjectPreToStructuralProxy" xil_pn:prop_ck="15701343915878886" xil_pn:start_ts="1469839184">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1469839184" xil_pn:name="TRAN_platgen" xil_pn:prop_ck="-5776748570199518549" xil_pn:start_ts="1469839184">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1469839194" xil_pn:in_ck="2380736482494028074" xil_pn:name="TRANEXT_xstsynthesize_virtex6" xil_pn:prop_ck="8443334690501230532" xil_pn:start_ts="1469839184">
+      <status xil_pn:value="FailedRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <outfile xil_pn:name="_xmsgs/xst.xmsgs"/>
+      <outfile xil_pn:name="ht_lut_core.lso"/>
+      <outfile xil_pn:name="ht_lut_core.ngc"/>
+      <outfile xil_pn:name="ht_lut_core.ngr"/>
+      <outfile xil_pn:name="ht_lut_core.prj"/>
+      <outfile xil_pn:name="ht_lut_core.syr"/>
+      <outfile xil_pn:name="ht_lut_core.xst"/>
+      <outfile xil_pn:name="ht_lut_core_xst.xrpt"/>
+      <outfile xil_pn:name="webtalk_pn.xml"/>
+      <outfile xil_pn:name="xst"/>
+    </transform>
+    <transform xil_pn:end_ts="1469839194" xil_pn:in_ck="-3090306734999349626" xil_pn:name="TRAN_compileBCD2" xil_pn:prop_ck="-5873777865883123879" xil_pn:start_ts="1469839194">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+    </transform>
+    <transform xil_pn:end_ts="1469802901" xil_pn:in_ck="8259375809299388996" xil_pn:name="TRANEXT_ngdbuild_FPGA" xil_pn:prop_ck="-2184738901335652651" xil_pn:start_ts="1469802885">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <outfile xil_pn:name="_ngo"/>
+      <outfile xil_pn:name="_xmsgs/ngdbuild.xmsgs"/>
+      <outfile xil_pn:name="ht_lut_core.bld"/>
+      <outfile xil_pn:name="ht_lut_core.ngd"/>
+      <outfile xil_pn:name="ht_lut_core_ngdbuild.xrpt"/>
+    </transform>
+    <transform xil_pn:end_ts="1469803037" xil_pn:in_ck="8259375809299388997" xil_pn:name="TRANEXT_map_virtex6" xil_pn:prop_ck="1926601603910769990" xil_pn:start_ts="1469802901">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="WarningsGenerated"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForOutputs"/>
+      <status xil_pn:value="OutputChanged"/>
+      <outfile xil_pn:name="_xmsgs/map.xmsgs"/>
+      <outfile xil_pn:name="ht_lut_core.pcf"/>
+      <outfile xil_pn:name="ht_lut_core_map.map"/>
+      <outfile xil_pn:name="ht_lut_core_map.mrp"/>
+      <outfile xil_pn:name="ht_lut_core_map.ncd"/>
+      <outfile xil_pn:name="ht_lut_core_map.ngm"/>
+      <outfile xil_pn:name="ht_lut_core_map.xrpt"/>
+      <outfile xil_pn:name="ht_lut_core_summary.xml"/>
+      <outfile xil_pn:name="ht_lut_core_usage.xml"/>
+    </transform>
+    <transform xil_pn:end_ts="1469803287" xil_pn:in_ck="4370419487517770718" xil_pn:name="TRANEXT_par_virtex5" xil_pn:prop_ck="6734387949470617483" xil_pn:start_ts="1469803037">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="WarningsGenerated"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <outfile xil_pn:name="_xmsgs/par.xmsgs"/>
+      <outfile xil_pn:name="ht_lut_core.ncd"/>
+      <outfile xil_pn:name="ht_lut_core.pad"/>
+      <outfile xil_pn:name="ht_lut_core.par"/>
+      <outfile xil_pn:name="ht_lut_core.ptwx"/>
+      <outfile xil_pn:name="ht_lut_core.unroutes"/>
+      <outfile xil_pn:name="ht_lut_core.xpi"/>
+      <outfile xil_pn:name="ht_lut_core_pad.csv"/>
+      <outfile xil_pn:name="ht_lut_core_pad.txt"/>
+      <outfile xil_pn:name="ht_lut_core_par.xrpt"/>
+    </transform>
+    <transform xil_pn:end_ts="1469803367" xil_pn:in_ck="4015275676054958075" xil_pn:name="TRANEXT_bitFile_virtex6" xil_pn:prop_ck="-3618303722886493866" xil_pn:start_ts="1469803287">
+      <status xil_pn:value="AbortedRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <status xil_pn:value="OutOfDateForced"/>
+      <outfile xil_pn:name="_xmsgs/bitgen.xmsgs"/>
+      <outfile xil_pn:name="ht_lut_core.bgn"/>
+      <outfile xil_pn:name="ht_lut_core.bit"/>
+      <outfile xil_pn:name="ht_lut_core.drc"/>
+      <outfile xil_pn:name="ht_lut_core.ut"/>
+      <outfile xil_pn:name="usage_statistics_webtalk.html"/>
+      <outfile xil_pn:name="webtalk.log"/>
+      <outfile xil_pn:name="webtalk_pn.xml"/>
+    </transform>
+    <transform xil_pn:end_ts="1469803287" xil_pn:in_ck="8259375809299388865" xil_pn:name="TRAN_postRouteTrce" xil_pn:prop_ck="445577401284416183" xil_pn:start_ts="1469803258">
+      <status xil_pn:value="SuccessfullyRun"/>
+      <status xil_pn:value="ReadyToRun"/>
+      <status xil_pn:value="OutOfDateForPredecessor"/>
+      <outfile xil_pn:name="_xmsgs/trce.xmsgs"/>
+      <outfile xil_pn:name="ht_lut_core.twr"/>
+      <outfile xil_pn:name="ht_lut_core.twx"/>
+    </transform>
+  </transforms>
 
 </generated_project>

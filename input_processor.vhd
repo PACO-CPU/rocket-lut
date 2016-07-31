@@ -1,8 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library paco_lut;
-use paco_lut.lut_package.all;
+library work;
+use work.lut_package.all;
 
 --! @brief Input bit selector pipeline stage for the LUT HW core
 --! @details The first pipeline stage inputs an input bitvector comprised of

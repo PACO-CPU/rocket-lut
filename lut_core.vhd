@@ -2,8 +2,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-library paco_lut;
-use paco_lut.lut_package.all;
+library work;
+use work.lut_package.all;
 
 --! @brief Top-level module for the LUT HW core
 --! @details This module connects directly to the processor pipeline or
@@ -50,6 +50,9 @@ architecture implementation of lut_core is
 
   signal inter_cfg_o : cfg_word_t;
   signal inter_pipeline_o : p_output_t;
+  
+  signal reg1v : std_logic;
+  signal reg1 : std_logic_vector(C_WORD_SIZE-1 downto 0);
 
 begin
   input_data(C_INPUT_BUFFER_SIZE-1 downto 3*C_WORD_SIZE) <= (others => '0');
@@ -119,7 +122,22 @@ begin
     pipeline_o => inter_pipeline_o
   );
 
+  
+
   data_o <= inter_pipeline_o.data;
   data_valid_o <= inter_pipeline_o.valid;
 
+--  process (clk) is begin
+--    if rising_edge(clk) then
+--      if id_exe_i='1' then
+--        reg1 <= not data_i;
+--      else
+--        reg1 <= (others => '0');
+--      end if;
+--      reg1v <= id_exe_i;
+--    end if;
+--  end process;
+--
+--  data_o <= reg1;
+--  data_valid_o <= reg1v;
 end architecture;

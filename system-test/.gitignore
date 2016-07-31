@@ -3,3 +3,5 @@
 /bootimage.hex
 *.o
 /main.s
+/main
+/dump.s

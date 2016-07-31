@@ -2,9 +2,9 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 
-library paco_lut;
-use paco_lut.lut_package.all;
-use paco_lut.test_package.all;
+library work;
+use work.lut_package.all;
+use work.test_package.all;
 
 entity tb_address_translator is
 end entity;

@@ -16,8 +16,10 @@ specification=ctrl.random_core()
 intermediate=ctrl.core_compile(specification)
 raw_words = ctrl.core_bitstream(specification)
 
+iface.print_config()
+
 iopairs=[
-  (lambda x:(x,intermediate.sim(x)))(ctrl.random_core_input())
+  (lambda x:(x,intermediate.sim(x)))(ctrl.random_core_input()&0xffffffff)
   for i in range(randomInputCount)
   ]+[ 
     (0,intermediate.sim(0)) 
