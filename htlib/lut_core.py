@@ -46,8 +46,8 @@ class LUTCoreControl(IDECControl,PLAControl,LUTControl,InterControl):
     "raw flags e_invalid_cfg e_premature_exe e_instr_code cfg_count")
 
   ## Generates a random LUT hardware core
-  def random_core(s):
-    idec=s.random_idec()
+  def random_core(s,singleInput=False):
+    idec=s.random_idec(singleInput=singleInput)
     pla =s.random_pla()
     lut =s.random_lut()
     

@@ -83,7 +83,7 @@ class IFace(serial.Serial):
   def command0i(s,cmd,data=None):
     words=[
       (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
-      for shamt in reversed(range(s.INPUT_WORDS))]
+      for shamt in range(s.INPUT_WORDS)]
 
     ty="I" if s._word_size==32 else "Q"
     raw=struct.pack("<B%s"%(ty*s.INPUT_WORDS),cmd,*words)
@@ -172,7 +172,7 @@ class IFace(serial.Serial):
   def commandi(s,cmd,data):
     words=[
       (data>>(s.WORD_SIZE*shamt))&((1<<s.WORD_SIZE)-1)
-      for shamt in reversed(range(s.INPUT_WORDS))]
+      for shamt in range(s.INPUT_WORDS)]
     
     ty="I" if s._word_size==32 else "Q"
 

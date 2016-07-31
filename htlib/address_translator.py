@@ -120,13 +120,13 @@ class PLAControl(IFaceRef):
     and_plane=sum([
       [ 
         (v>>(s.iface.CFG_WORD_SIZE*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) 
-        for shamt in range(and_words) ]
+        for shamt in reversed(range(and_words)) ]
       for v in inter.and_plane
     ],[])
     or_plane=sum([
       [ 
         (v>>(s.iface.CFG_WORD_SIZE*shamt))&((1<<s.iface.CFG_WORD_SIZE)-1) 
-        for shamt in range(and_words) ]
+        for shamt in reversed(range(and_words)) ]
       for v in inter.or_plane
     ],[])
 
