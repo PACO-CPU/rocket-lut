@@ -26,9 +26,15 @@ class IDECControl(IFaceRef):
   # @return a specification ready for use with idec_compile, idec_words and
   # config_idec.
   def random_idec(s,singleInput=False):
-    words=1 if singleInput else s.iface.INPUT_WORDS
+    word_offset=0
+    words=s.iface.INPUT_WORDS
+    if singleInput in {1,2,3}:
+      word_offset=(singleInput-1)*s.iface.WORD_SIZE
+      words=1
+    elif singleInput==True:
+      words=1
     choices=[
-      random.randint(0,words*s.iface.WORD_SIZE-1) 
+      word_offset+random.randint(0,words*s.iface.WORD_SIZE-1) 
       for i in range(s.iface.SELECTOR_BITS+s.iface.INTERPOLATION_BITS)] 
     return IDECControl.specification_t(choices)
   

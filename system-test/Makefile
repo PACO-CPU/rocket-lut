@@ -42,8 +42,8 @@ main: main.o
 main.bin: main
 	$(CROSS_COMPILE)objcopy -O binary main main.bin
 
-main.dump: main
-	$(CROSS_COMPILE)objdump -D main > main.dump
+dump.s: main
+	$(CROSS_COMPILE)objdump -D main > dump.s
 
 main.s: main.c test_data.c
 	$(CROSS_COMPILE)gcc $(CFLAGS) -S $< -o $@ 
