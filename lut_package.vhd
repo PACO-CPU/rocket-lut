@@ -9,8 +9,12 @@ library work;
 
 package lut_package is
 
+  function clog2(x:positive) return natural;
   function cdiv(x:positive; y:positive) return natural;
   function max(x:integer; y:integer) return integer;
+
+  constant C_LUT_CORE_COUNT : integer := 8;
+  constant C_LUT_CORE_COUNT_BITS : integer := clog2(C_LUT_CORE_COUNT);
   
   -- Embedding-specific constants (Rocket Chip/SoC)
   constant C_WORD_SIZE : integer := 64;
@@ -30,6 +34,12 @@ package lut_package is
   constant C_INPUT_DECODER_DELAY : integer := 0;
   constant C_ADDRESS_TRANSLATOR_DELAY : integer := 0;
   constant C_INTERPOLATOR_DELAY : integer := 0;
+  constant C_DATAPATH_DELAY : integer := 
+    C_CONTROLLER_DELAY+
+    C_INPUT_DECODER_DELAY+
+    C_ADDRESS_TRANSLATOR_DELAY+
+    1+
+    C_INTERPOLATOR_DELAY;
 
   -- derived constants
   constant C_INPUT_WORD_SIZE : integer := C_WORD_SIZE*C_INPUT_WORDS;
@@ -233,6 +243,16 @@ package lut_package is
 end package;
 
 package body lut_package is
+
+  function clog2(x:positive) return natural is
+    variable d: natural;
+  begin
+    d := 0;
+    while 2**d < x loop
+      d := d+1;
+    end loop;
+    return d;
+  end function;
 
   function cdiv(x:positive; y:positive) return natural is
     variable d: natural;
