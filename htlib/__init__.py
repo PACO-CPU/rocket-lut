@@ -6,3 +6,4 @@ from .address_translator import *
 from .lut import *
 from .interpolator import *
 from .lut_core import *
+from .visualizer import *

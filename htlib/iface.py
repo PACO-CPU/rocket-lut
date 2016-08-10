@@ -213,6 +213,9 @@ class IFace(serial.Serial):
       os.path.abspath(os.path.dirname(__file__)),
       "../lut_package.vhd")
 
+    if not os.path.exists(fn):
+      return
+
 
     fields={
       "SELECTOR_BITS",

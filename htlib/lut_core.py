@@ -29,7 +29,15 @@ class LUTCoreControl(IDECControl,PLAControl,LUTControl,InterControl):
   # IDECControl, PLAControl, LUTControl and InterControl classes, respectively.
   # Additionally, sim is a wrapper function executing all the pipeline stages
   # at once using just an input word and outputting the final result.
-  intermediate_t=namedtuple("lut_core_intermediate_t","idec pla lut inter sim")
+  # sim_ex performs the same simulation but returns a value of type
+  # sim_result_t.
+  intermediate_t=namedtuple(
+    "lut_core_intermediate_t","idec pla lut inter sim sim_ex")
+
+  ## For a more in-depth look into the lut core, simulation can return a 
+  # compound value with more information. This is the type of that value.
+  sim_result_t=namedtuple(
+    "lut_core_sim_result_t","selector interpolator address result")
 
   ## Structure holding information on the current status of an instantiated
   # lut hardware core.
@@ -119,7 +127,7 @@ class LUTCoreControl(IDECControl,PLAControl,LUTControl,InterControl):
   ## Assembles compiled input decoder PLA, LUT and interpolator intermediates
   # into a lut core intermediate
   def core_compile_raw(s,idec,pla,lut,inter):
-    def sim(x):
+    def sim_ex(x):
       y_idec=idec.sim(x)
       interpolator=(y_idec)&((1<<s.iface.INTERPOLATION_BITS)-1)
       selector=(y_idec>>s.iface.INTERPOLATION_BITS)&((1<<s.iface.SELECTOR_BITS)-1)
@@ -133,9 +141,12 @@ class LUTCoreControl(IDECControl,PLAControl,LUTControl,InterControl):
       
       y_inter=inter.sim(selector,interpolator,base,incline)
 
-      return y_inter
+      return LUTCoreControl.sim_result_t(selector,interpolator,address,y_inter)
 
-    return LUTCoreControl.intermediate_t(idec,pla,lut,inter,sim)
+    def sim(x):
+      return sim_ex(x).y_inter
+
+    return LUTCoreControl.intermediate_t(idec,pla,lut,inter,sim,sim_ex)
   
   ## Translates a lut core specification into a list of configuration words
   # ready to be sent as configuration data to a lut core instantiation.
