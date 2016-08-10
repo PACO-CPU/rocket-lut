@@ -235,6 +235,28 @@ class IFace(serial.Serial):
         (ids,val)=m.groups()
         if ids in fields:
           setattr(s,"_%s"%ids.lower(),int(val))
+
+  def load_arch_file(s,fn):
+    
+    fields={
+      "selectorBits": "SELECTOR_BITS",
+      "interpolationBits": "INTERPOLATION_BITS",
+      "segmentBits": "SEGMENT_BITS",
+      "plaInterconnects": "PLA_INTERCONNECTS",
+      "base_bits": "BASE_BITS",
+      "incline_bits": "INCLINE_BITS",
+    }
+    e=re.compile(r"([a-zA-Z_]+)[ \t]*=[ \t]*([0-9]+)")
+    with open(fn,"r") as f:
+      for ln in f:
+        m=e.match(ln.strip())
+        if not m: continue
+        (id,val_s)=m.groups()
+        if not id in fields: continue
+
+        setattr(s,"_%s"%fields[id].lower(),int(val_s))
+
+
   
   ## Performs a test case common to all hardware tests, ensuring that the
   # test state machine itself is reachable and operational.
