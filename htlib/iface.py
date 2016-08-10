@@ -282,7 +282,7 @@ class IFace(serial.Serial):
           %(i+1024,old))
   
   ## Outputs details of the previously queried configuration data on stdout.
-  def print_config(s):
+  def print_config(s,extended=False):
     print("  word size: .............. %s"%s.WORD_SIZE)
     print("  input words: ............ %s"%s.INPUT_WORDS)
     print("  selector bits: .......... %s"%s.SELECTOR_BITS)
@@ -295,6 +295,17 @@ class IFace(serial.Serial):
     print("  input decoder delay: .... %s"%s.INPUT_DECODER_DELAY)
     print("  address translator delay: %s"%s.ADDRESS_TRANSLATOR_DELAY)
     print("  interpolator delay: ..... %s"%s.INTERPOLATOR_DELAY)
+
+    if extended:
+      len_max=0
+      keys=set()
+      for v in dir(s):
+        if v.upper()!=v or v.startswith("_"): continue
+        len_max=max(len_max,len(v))
+        keys.add(v)
+      for v in sorted(keys):
+        padding="" if len(v)==len_max else " %s"%("."*(len_max-len(v)-1))
+        print("  %s:%s %s"%(v,padding,getattr(s,v)))
 
   @property
   def WORD_SIZE(s):
