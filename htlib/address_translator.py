@@ -90,7 +90,12 @@ class PLAControl(IFaceRef):
       for products in arg_products]
 
     or_plane=sums+[0]*(s.iface.SEGMENT_BITS-len(sums))
+
+    return s.pla_compile_raw(and_plane,or_plane)
     
+  ## Final PLA compilation step operating on and and or planes instead of 
+  # string-based specifications.
+  def pla_compile_raw(s,and_plane,or_plane):
     def sim(sel):
       bits=[ 
         0 if (sel&(1<<i)) else 1
@@ -107,6 +112,7 @@ class PLAControl(IFaceRef):
 
 
     return PLAControl.intermediate_t(and_plane,or_plane,sim)
+
 
   ## Translates an and and or plane as computed by pla_compile into a stream of
   # registers to be applied to a hardware core

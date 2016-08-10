@@ -57,13 +57,18 @@ class IDECControl(IFaceRef):
       0 if i>=len(spec.choices) else 1<<spec.choices[i]
       for i in range(s.iface.SELECTOR_BITS+s.iface.INTERPOLATION_BITS)]
 
+    return s.idec_compile_raw(choices)
+  
+  ## Compiles an list of crosspoints for input values into an intermediate
+  # representation, used by idec_compile.
+  def idec_compile_raw(s,choices):
     def sim(x):
       bits=[ 
         (x>>i)&1 
         for i in range(s.iface.INPUT_WORD_SIZE)]
       r=0
-      for i,arg in enumerate(spec.choices):
-        r+=bits[arg]<<i
+      for i,arg in enumerate(choices):
+        r+=(1<<i) if (x&arg)!=0 else 0
       return r 
     return IDECControl.intermediate_t(choices,sim)
   
