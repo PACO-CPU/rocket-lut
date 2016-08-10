@@ -6,7 +6,7 @@ e=re.compile(r"\s*constant\s*C_([A-Z_0-9]+)\s*:\s*integer\s*:=\s*([0-9]+?)\s*;$"
 data=dict()
 
 fields={
-  "SELECTOR_BITS": "segmentBits",
+  "SELECTOR_BITS": "selectorBits",
   "INTERPOLATION_BITS": "interpolationBits",
   "SEGMENT_BITS": "segmentBits",
   "PLA_INTERCONNECTS":"plaInterconnects",
