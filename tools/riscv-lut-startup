@@ -1,0 +1,154 @@
+#!/usr/bin/env python3
+import re,sys,os,shutil
+import htlib
+
+fnArch=None
+fOutputConfiguration=False
+idents=[]
+fnOut=None
+fout=sys.stdout
+entry="main"
+
+
+def print_help(f=sys.stdout):
+  f.write(
+    "riscv-lut-startup [options] id1 [id2 [...]]\n"
+    "  tool for creating startup code for applications using LUT cores.\n"
+    "options:\n"
+    "  -a|--arch <filename>\n"
+    "    Load an architecture file to retrieve LUT core parameters.\n"
+    "  -c|--configuration\n"
+    "    Output the configuration data after loading an arch file\n"
+    "  -h|--help\n"
+    "    print this help text and exit\n"
+    "  -o|--output <filename>\n"
+    "    set the output file name. Defaults to standard output.\n"
+    "  -e|--entry <identifier>\n"
+    "    specify the entry point to jump to after startup was completed.\n"
+    "    defaults to: {entry}\n"
+    "".format(entry=entry))
+
+try:
+  s=None
+  for arg in sys.argv[1:]:
+    if s==None:
+      if arg[:1]=="-":
+        if arg in {"-h","--help"}: 
+          print_help(sys.stdout)
+          sys.exit(0)
+        elif arg in {"-a","--arch"}: s="--arch"
+        elif arg in {"-o","--output"}: s="--output"
+        elif arg in {"-e","--entry"}: s="--entry"
+        elif arg in {"-c","--configuration"}: fOutputConfiguration=True
+        else:
+          raise Exception("unknown switch: %s"%arg)
+      else:
+        idents.append(arg)
+    elif s=="--arch":
+      fnArch=arg
+      s=None
+    elif s=="--output":
+      fnOut=arg
+      s=None
+    elif s=="--entry":
+      entry=arg
+      s=None
+
+  if s=="--arch": raise Exception("arch file name expected")
+
+  if len(idents)<1:
+    raise Exception("no LUT identifier specified")
+
+  if fnOut!=None:
+    fout=open(fnOut,"w")
+
+except Exception as e:
+  print_help(sys.stderr)
+  sys.stderr.write("\x1b[31;1mError: \x1b[30;0m%s\n"%e)
+  sys.exit(1)
+
+iface=htlib.IFace()
+
+if fnArch!=None:
+  print("loading arch file: %s"%fnArch)
+  iface.load_arch_file(fnArch)
+
+if fOutputConfiguration:
+  iface.print_config(extended=True)
+
+
+  
+base=(
+"""
+	lutl zero, {idx}, 0, 0
+  addi	x2, x2, -16
+	sd	x8, 8(x2)
+	add	x8, x0, x2
+	sw	x0, 4(x8)
+.lbl_startup_{idx}_1:
+	lw	x5, 4(x8)
+	li	x6, {bitstream_high}
+	blt	x6, x5, .lbl_startup_{idx}_4
+	j	.lbl_startup_{idx}_2
+.lbl_startup_{idx}_2:
+	lw	x5, 4(x8)
+	slli	x5, x5, 3
+	lui	x6, %hi({ident})
+	addi	x6, x6, %lo({ident})
+	add	x5, x6, x5
+	lbu	x6, 0(x5)
+	lbu	x7, 1(x5)
+	slli	x7, x7, 8
+	or	x6, x7, x6
+	lbu	x7, 2(x5)
+	lbu	x10, 3(x5)
+	slli	x10, x10, 8
+	or	x7, x10, x7
+	slli	x7, x7, 16
+	or	x6, x7, x6
+	lbu	x7, 4(x5)
+	lbu	x10, 5(x5)
+	slli	x10, x10, 8
+	or	x7, x10, x7
+	lbu	x10, 6(x5)
+	lbu	x5, 7(x5)
+	slli	x5, x5, 8
+	or	x5, x5, x10
+	slli	x5, x5, 16
+	or	x5, x5, x7
+	slli	x5, x5, 32
+	or	x5, x5, x6
+	#APP
+	lutl x5, {idx}, 0, 1
+	#NO_APP
+	lw	x5, 4(x8)
+	addiw	x5, x5, 1
+	sw	x5, 4(x8)
+	j	.lbl_startup_{idx}_1
+.lbl_startup_{idx}_4:
+	add	x2, x0, x8
+	ld	x8, 8(x2)
+	addi	x2, x2, 16
+""")
+
+fout.write(
+  "\t.text\n"
+  "\t.align\t2\n"
+  "".format(entry=entry))
+
+for idx,ident in enumerate(idents):
+  fout.write(
+    base.format(
+      idx=idx,
+      ident=ident,
+      bitstream_high=iface.CFG_REGISTER_COUNT-1
+    ))
+  pass
+
+fout.write(
+  "\tj\t{entry}\n"
+  "".format(entry=entry))
+
+if fnOut!=None:
+  fout.close()
+
