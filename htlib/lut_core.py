@@ -144,7 +144,7 @@ class LUTCoreControl(IDECControl,PLAControl,LUTControl,InterControl):
       return LUTCoreControl.sim_result_t(selector,interpolator,address,y_inter)
 
     def sim(x):
-      return sim_ex(x).y_inter
+      return sim_ex(x).result
 
     return LUTCoreControl.intermediate_t(idec,pla,lut,inter,sim,sim_ex)
   
