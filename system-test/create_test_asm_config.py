@@ -11,6 +11,7 @@ random.seed(time.time())
 random.seed(12)
 
 iface=htlib.IFace()
+iface.load_config_file("../lut_package.vhd")
 ctrl=htlib.LUTCoreControl(iface)
 
 iface.print_config()

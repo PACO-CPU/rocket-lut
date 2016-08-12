@@ -12,6 +12,11 @@ fields={
   "PLA_INTERCONNECTS":"plaInterconnects",
   "BASE_BITS": "base_bits",
   "INCLINE_BITS": "incline_bits",
+  "INPUT_DECODER_DELAY": "delay_inputDecoder",
+  "ADDRESS_TRANSLATOR_DELAY": "delay_addressTranslator",
+  "INTERPOLATOR_DELAY": "delay_interpolator",
+  "CONTROLLER_DELAY": "delay_controller",
+  "INPUT_WORDS": "inputWords",
 }
 
 with open("lut_package.vhd","r") as f:

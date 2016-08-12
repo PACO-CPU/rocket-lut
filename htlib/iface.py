@@ -205,13 +205,18 @@ class IFace(serial.Serial):
     s._interpolator_delay=s.command8(CMD_CFG_INTERPOLATOR_DELAY)
   
   ## Loads architecture-specific parameters by reading the lut_package file.
-  def load_config_file(s):
+  #
+  # @param fn File name of the lut_package file to read. Leave at None to use
+  # the default one. This only words if the script is located in the rocket-lut
+  # repository and NOT with the installed version!
+  def load_config_file(s, fn=None):
     e=re.compile(
       r"\s*constant\s*C_([A-Z_0-9]+)\s*:\s*integer\s*:=\s*([0-9]+?)\s*;$")
-
-    fn=os.path.join(
-      os.path.abspath(os.path.dirname(__file__)),
-      "../lut_package.vhd")
+    
+    if fn==None:
+      fn=os.path.realpath(os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        "../lut_package.vhd"))
 
     if not os.path.exists(fn):
       return
@@ -248,6 +253,11 @@ class IFace(serial.Serial):
       "plaInterconnects": "PLA_INTERCONNECTS",
       "base_bits": "BASE_BITS",
       "incline_bits": "INCLINE_BITS",
+      "delay_inputDecoder": "INPUT_DECODER_DELAY",
+      "delay_addressTranslator": "ADDRESS_TRANSLATOR_DELAY",
+      "delay_interpolator": "INTERPOLATOR_DELAY",
+      "delay_controller": "CONTROLLER_DELAY",
+      "inputWords": "INPUT_WORDS"
     }
     e=re.compile(r"([a-zA-Z_]+)[ \t]*=[ \t]*([0-9]+)")
     with open(fn,"r") as f:
