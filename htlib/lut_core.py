@@ -223,8 +223,10 @@ class LUTCoreControl(IDECControl,PLAControl,LUTControl,InterControl):
     cfg_count=None,msg="assertion failed"):
     
     stat=s.core_status()
-    
-    if raw!=None and stat.raw!=raw: 
+
+    # mask out the state bits (4..3 = 0x18) these are only used by the rocket-soc
+    # and can be ignored here
+    if raw!=None and (stat.raw & ~0x18) !=raw:
       raise Exception(
         "lut core status error: expected %.8x, got %.8x"%(raw,stat.raw))
 

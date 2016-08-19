@@ -67,6 +67,7 @@ architecture implementation of lut_controller is
   signal e_invalid_cfg   : std_logic;
   signal e_premature_exe : std_logic;
   signal e_instr_code    : std_logic;
+  signal e_status			 : std_logic_vector(1 downto 0);
   
   type p_delay_t is array(0 to C_CONTROLLER_DELAY) of p_input_t;
   signal p_delay : p_delay_t;
@@ -108,6 +109,7 @@ begin
       -- per-state signals
       case state is 
         when STATE_CFG_RAM => 
+			 e_status <= "00";
           cfg_mode_o <= '1';
         when others => 
           null;
@@ -129,7 +131,7 @@ begin
         e_invalid_cfg   <= '0';
         e_premature_exe <= '0';
         e_instr_code    <= '0';
-
+		  e_status <= "00";
         
         -- status remains uninitialized as we do not need it outside of
         -- id_staT_i.
@@ -142,6 +144,7 @@ begin
         status_o(0) <= e_invalid_cfg;
         status_o(1) <= e_premature_exe;
         status_o(2) <= e_instr_code;
+        status_o(4 downto 3) <= e_status;
       
       elsif id_cfg_i='1' then -- perform a configure instruction
         case state is
@@ -171,14 +174,16 @@ begin
             cfg_o.d <= data_i(C_CFG_WORD_SIZE-1 downto 0);
             cfg_count <= cfg_count +1;
             cfg_o.valid <= '1';
-            
+            e_status <= "01";
             if cfg_count+1=C_CFG_REGISTER_COUNT then
               state <= STATE_READY;
+				  e_status <= "10";
             end if;
 
           when others =>
             state <= STATE_ERROR;
             e_invalid_cfg <= '1';
+				e_status <= "11";
 
         end case;
 
