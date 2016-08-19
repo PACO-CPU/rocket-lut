@@ -136,7 +136,15 @@ class PLAControl(IFaceRef):
       for v in inter.or_plane
     ],[])
 
-    return and_plane+or_plane
+    # This fills up the or_plane with zeros , if one column consits of more than
+    # WORD_LEN configuration words. Otherwise the hardware would expect more
+    # words for the or plane than we generate here.
+    or_plane2=[]
+    used_or_regs = math.ceil(len(or_plane)/s.iface.SEGMENT_BITS)
+
+    for seg_line in or_plane:
+        or_plane2 = or_plane2 + [0] * (or_words-used_or_regs) + [seg_line]
+    return and_plane+or_plane2
 
   ## Compiles and downloads a PLA onto the connected hardware.
   def config_pla(s,spec):
