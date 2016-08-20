@@ -16,7 +16,7 @@ parser.add_argument('--input-size', nargs=1)
 args = parser.parse_args()
 
 if args.input_size:
-    randomInputCount = args.input_size[0]
+    randomInputCount = int(args.input_size[0])
 else:
     randomInputCount = 50
 
