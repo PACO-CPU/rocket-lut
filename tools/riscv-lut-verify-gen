@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+
+import htlib
+import argparse
+import sys
+import math
+import random
+import time
+import os
+
+# argument parser
+parser = argparse.ArgumentParser(description="riscv-lut-verify-gen")
+parser.add_argument('--arch', nargs=1)
+parser.add_argument('-o', nargs=1)
+parser.add_argument('--input-size', nargs=1)
+args = parser.parse_args()
+
+if args.input_size:
+    randomInputCount = args.input_size[0]
+else:
+    randomInputCount = 50
+
+# setup the htlib
+iface=htlib.IFace()
+if args.arch != None:
+    iface.load_arch_file(args.arch[0])
+else:
+    iface.print_config(extended=False)
+
+ctrl=htlib.LUTCoreControl(iface)
+specification=ctrl.random_core()
+intermediate=ctrl.core_compile(specification)
+raw_words = ctrl.core_bitstream(specification)
+
+# setup file paths
+if args.o != None:
+    bitstream_path = args.o[0] + "/bitstream.h"
+    input_vec_path = args.o[0] + "/input_vec.h"
+    output_vec_path = args.o[0] + "/output_vec.h"
+else:
+    path = os.path.dirname(os.path.realpath(__file__))
+    print("No default path giving. Files are saved in:")
+    print(""+str(path))
+    bitstream_path = path + "/bitstream.h"
+    input_vec_path = path + "/input_vec.h"
+    output_vec_path = path + "/output_vec.h"
+
+# cleanup filespaths
+if os.path.isfile(bitstream_path):
+    os.remove(bitstream_path)
+if os.path.isfile(input_vec_path):
+    os.remove(input_vec_path)
+if os.path.isfile(output_vec_path):
+    os.remove(output_vec_path)
+
+# open files
+bitstream_file = open(bitstream_path, 'w')
+input_vec_file = open(input_vec_path, 'w')
+output_vec_file = open(output_vec_path, 'w')
+
+# write bitstream
+bitstream_file.write("#define BITSTREAM_SIZE " + str(len(raw_words)) + "\n")
+bitstream_file.write("uint64_t lut0[BITSTREAM_SIZE] = {\n")
+
+for w in raw_words:
+
+    if int(w) > (1 << 64):
+        print("Error: Bitstream-word is longer than 64-bit")
+        exit(0)
+    bitstream_file.write("" + str(w) + "UL,\n")
+
+bitstream_file.write("};\n")
+bitstream_file.close()
+
+# write generated random input + simulated output
+input_vec_file.write("#define INPUT_SIZE " + str(randomInputCount) + "\n")
+input_vec_file.write("uint64_t input_vec[" + str(randomInputCount) + "] = { \n")
+output_vec_file.write("uint64_t output_vec[" + str(randomInputCount) + "] = { \n")
+
+for i in range(0, randomInputCount):
+    x = ctrl.random_core_input()
+    if int(x) > (1 << 64):
+        print("Error: Input-word is longer than 64-bit")
+        exit(0)
+    y = intermediate.sim(x)
+    input_vec_file.write(str(x) + "UL,\n")
+    output_vec_file.write(str(y) + "UL,\n")
+
+input_vec_file.write("};")
+output_vec_file.write("};")
+
+input_vec_file.close()
+output_vec_file.close()
