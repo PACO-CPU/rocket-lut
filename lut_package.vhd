@@ -22,10 +22,10 @@ package lut_package is
   constant C_INPUT_WORDS : integer := 3;
   
   -- LUT HW core specifics
-  constant C_SELECTOR_BITS : integer := 8;
-  constant C_INTERPOLATION_BITS : integer := 8;
-  constant C_SEGMENT_BITS : integer := 4;
-  constant C_PLA_INTERCONNECTS : integer := 12;
+  constant C_SELECTOR_BITS : integer := 9;
+  constant C_INTERPOLATION_BITS : integer := 12;
+  constant C_SEGMENT_BITS : integer := 7;
+  constant C_PLA_INTERCONNECTS : integer := 204;
   constant C_BASE_BITS : integer := 48;
   constant C_INCLINE_BITS : integer := 32;
 
